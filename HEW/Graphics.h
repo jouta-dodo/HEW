@@ -16,7 +16,7 @@ struct ColorF
 	//本来のやり方
 	constexpr ColorF(float _r, float _g, float _b, float _a = 1.0f) :r(_r), g(_g), b(_b), a(_a){}
 
-	//絵描きソフトと同じ感じのやつ
+	//RGB指定
 	constexpr ColorF(int _r,int _g,int _b,int _a=255):r(_r/255.0f),g(_g/255.0f), b(_b / 255.0f), a(_a / 255.0f) {}
 };
 

@@ -10,18 +10,19 @@ using namespace std;
 //使い方★
 //namespace Gameの中に必ず書く
 // 前のやつと同じようにInit(初期化),Update(更新),Draw(描画)の三種の神器を使います
+// ISceneを新しく作成するシーンに継承します
 //例　タイトルシーン
 //class TitleScene:public IScene
 //{
-//void Init()overrride<-これ絶対書いてね
+//void Init()overrride<-これ絶対書いてね	初期化
 //	{
 //		std::cout<<"おなかすいた";
 //	{
-//void Update()override
+//void Update()override　	更新処理
 //	{
 //		
 //	}
-//void Draw()override
+//void Draw()override	描画処理
 //	{
 //
 //	}
@@ -50,10 +51,10 @@ namespace Game
 		//バインド処理
 		Input::BindAction(Cmd::MoveLeft, { Key::Left,Key::A }, { Button::Left });
 		Input::BindAction(Cmd::MoveRight, { Key::Right, Key::D }, { Button::Right });
-		cout << "初期化完了";
+		cout << "初期化完了"<<endl;
 
 		//===========================================
-		//ここにシーンの設定のやつ書く
+		//ここにシーンの切り替え書く
 		//SceneManager::ChangeScene(new TitleScene);
 		//===========================================
 
@@ -64,11 +65,11 @@ namespace Game
 
 		if (texPlayer.Get() == nullptr)
 		{
-			MessageBox(nullptr, L"画像の読み込み失敗",L"警告", MB_OK);
+			cout << "エラー：画像の読み込み失敗";
 		}
 		else
 		{
-			MessageBox(nullptr, L"画像読み込み成功", L"成功", MB_OK);
+			cout << "画像読み込み成功" << endl;;
 		}
 	}
 
