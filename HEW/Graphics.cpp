@@ -273,3 +273,40 @@ void Graphics::DrawImage(float x, float y, float w, float h, ComPtr<ID3D11Shader
 	s_context->PSSetSamplers(0, 1, s_samplerState.GetAddressOf());
 	s_context->Draw(4, 0);
 }
+
+void Graphics::DrawDashedBorder(float x, float y, float w, float h, const ColorF& color, float dashLength, float thickness)
+{
+	auto DrawDashLine = [&](float startX, float startY, float endX, float endY)
+		{
+			float dx = endX - startX;
+			float dy = endY - startY;
+			float length = sqrtf(dx * dx + dy * dy);
+			int segments = static_cast<int>(length / dashLength);
+
+			for (int i = 0;i < segments;i++)
+			{
+				if (i % 2 == 1) continue;
+
+				float t1 = (float)i / segments;
+				float t2 = (float)(i + 1) / segments;
+
+				float x1 = startX + dx * t1;
+				float y1 = startY + dy * t1;
+				float x2 = startX + dx * t2;
+				float y2 = startY + dy * t2;
+
+				if (abs(dx) > abs(dy))
+				{
+					DrawRect(x1, y1 - thickness * 0.5f, (x2 - x1), thickness, color);
+				}
+				else
+				{
+					DrawRect(x1 - thickness * 0.5f, y1, thickness, (y2 - y1), color);
+				}
+			}
+		};
+	DrawDashLine(x, y, x + w, y);
+	DrawDashLine(x + w, y, x + w, y + h);
+	DrawDashLine(x + w, y + h, x, y + h);
+	DrawDashLine(x, y + h, x, y);
+}

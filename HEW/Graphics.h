@@ -62,6 +62,7 @@ public:
 
 	static void DrawRect(float x, float y, float w, float h, const ColorF& color);
 
+	static void DrawDashedBorder(float x, float y, float w, float h, const ColorF& color, float dashLenght = 10.0f, float thickness = 2.0f);
 	//‰æ‘œ“\‚è•t‚¯‚Ì‚â‚Â
 	static ComPtr<ID3D11ShaderResourceView> LoadTexture(const wchar_t* filename);
 	static void DrawImage(float x, float y, float w, float h, ComPtr<ID3D11ShaderResourceView> texture, const ColorF& color = Color::White);
