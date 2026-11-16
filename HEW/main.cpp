@@ -1,5 +1,7 @@
 #include<windows.h>
 #include<iostream>
+#include<chrono>
+#include<thread>
 #include"Input.h"
 #include"graphics.h"
 #include"Game.h"
@@ -43,6 +45,8 @@ int main()
 	//èàóùåƒÇ‘Ç∆Ç±
 	Game::Init();
 
+	const double TARGET_FRAME_TIME = 1000.0 / 60.0;
+
 	MSG msg = {};
 	while (true)
 	{
@@ -54,8 +58,9 @@ int main()
 		}
 		else
 		{
-			Input::Update();
+			auto startTime = std::chrono::steady_clock::now();
 
+			Input::Update();
 			if (Input::IsKeyPressed(Key::Escape))break;
 
 			Game::Update();
@@ -65,6 +70,15 @@ int main()
 			Game::Draw();
 			//ï`âÊèIóπ
 			Graphics::EndDraw();
+
+			auto endTime = std::chrono::steady_clock::now();
+			std::chrono::duration<double, std::milli>elapsed = endTime - startTime;
+
+			if (elapsed.count() < TARGET_FRAME_TIME)
+			{
+				int sleepTime = static_cast<int>(TARGET_FRAME_TIME - elapsed.count());
+				std::this_thread::sleep_for(std::chrono::milliseconds(sleepTime));
+			}
 		}
 	}
 
