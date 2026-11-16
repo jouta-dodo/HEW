@@ -125,6 +125,7 @@
   <ItemGroup>
     <ClCompile Include="ActionInput.cpp" />
     <ClCompile Include="CountJudgeMock.cpp" />
+    <ClCompile Include="CSVLoad.cpp" />
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="Graphics.cpp" />
     <ClCompile Include="Input.cpp" />
@@ -135,7 +136,9 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="BlockData.h" />
+    <ClInclude Include="contents.h" />
     <ClInclude Include="CountJudgeMock.h" />
+    <ClInclude Include="CSVLoad.h" />
     <ClInclude Include="Game.h" />
     <ClInclude Include="Graphics.h" />
     <ClInclude Include="Input.h" />

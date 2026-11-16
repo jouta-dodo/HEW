@@ -11,6 +11,8 @@
 #include "CountJudgeMock.h"
 #include "PuzzleConstants.h" //統合した定数ファイル
 
+#include "CSVLoad.h"
+
 using namespace std;
 
 //=================================================================================
@@ -40,6 +42,8 @@ namespace Game
 	enum class Cmd { Jump, MoveLeft, MoveRight };
 	ComPtr<ID3D11ShaderResourceView> texPlayer;
 	ComPtr<ID3D11ShaderResourceView> texWhite; //白の正方形画像 名前は　siroiro.png
+	
+	CSVLoad blockdata;
 
 	float playerX = 640.0f - 50.0f;
 	float playerY = 360.0f - 50.0f;
@@ -169,6 +173,8 @@ namespace Game
 		//==============
 		texPlayer = Graphics::LoadTexture(L"assets\\ui.png");
 		texWhite = Graphics::LoadTexture(L"assets\\siroiro.png");
+
+		blockdata.LoadBlockCSV("assets/stage1.csv");
 
 		if (texPlayer.Get() == nullptr)
 		{
