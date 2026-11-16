@@ -7,6 +7,9 @@ namespace Game
 	//毎フレーム呼ばれるやつ
 	void Update();
 
+	// ゴール接触などでステージクリアが確定した時に呼び出す
+	void OnStageCleared();
+
 	//描画
 	void Draw();
 };

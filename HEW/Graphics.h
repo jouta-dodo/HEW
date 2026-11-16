@@ -14,10 +14,10 @@ struct ColorF
 	float r, g, b, a;
 
 	//本来のやり方
-	constexpr ColorF(float _r, float _g, float _b, float _a = 1.0f) :r(_r), g(_g), b(_b), a(_a){}
+	constexpr ColorF(float _r, float _g, float _b, float _a = 1.0f) :r(_r), g(_g), b(_b), a(_a) {}
 
-	//RGB指定
-	constexpr ColorF(int _r,int _g,int _b,int _a=255):r(_r/255.0f),g(_g/255.0f), b(_b / 255.0f), a(_a / 255.0f) {}
+	//絵描きソフトと同じ感じのやつ
+	constexpr ColorF(int _r, int _g, int _b, int _a = 255) : r(_r / 255.0f), g(_g / 255.0f), b(_b / 255.0f), a(_a / 255.0f) {}
 };
 
 //=============================
@@ -33,7 +33,7 @@ namespace Color
 	constexpr ColorF Yellow(1.0f, 1.0f, 0.0f);
 	constexpr ColorF Cyan(0.0f, 1.0f, 1.0f);
 	constexpr ColorF Magenta(1.0f, 0.0f, 1.0f);
-	
+
 	constexpr ColorF Orange(255, 165, 0);
 	constexpr ColorF Purple(128, 0, 128);
 	constexpr ColorF SkyBlue(135, 206, 235);

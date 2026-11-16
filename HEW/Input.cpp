@@ -95,7 +95,7 @@ void Input::Update()
 	}
 
 	//キーボードの状態更新
-	for (int vk = 0;vk < 256;++vk)
+	for (int vk = 0; vk < 256; ++vk)
 	{
 		s_prevRawKeys[vk] = s_currentRawKeys[vk];
 		s_currentRawKeys[vk] = (GetAsyncKeyState(vk) & 0x8000) != 0;
