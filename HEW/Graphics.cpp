@@ -2,7 +2,6 @@
 #include<d3dcompiler.h>
 #include<wincodec.h>
 #include<vector>
-#include<iostream>
 
 #pragma comment(lib,"d3d11.lib")
 #pragma comment(lib,"dxgi.lib")
@@ -34,7 +33,7 @@ bool Graphics::Init(HWND hwnd, int width, int height)
 
 	if (!hwnd)
 	{
-		std::cout << "ウィンドウ作成失敗";
+		MessageBox(nullptr, L"ウィンドウ作成失敗", L"原因特定", MB_OK);
 		return false;
 	}
 
@@ -57,7 +56,7 @@ bool Graphics::Init(HWND hwnd, int width, int height)
 	HRESULT hr = D3D11CreateDeviceAndSwapChain(nullptr, D3D_DRIVER_TYPE_HARDWARE, nullptr, 0, &featurLevel, 1, D3D11_SDK_VERSION, &sd, &s_swapChain, &s_device, nullptr, &s_context);
 	if (FAILED(hr))
 	{
-		std::cout << "DirectX初期化失敗";
+		MessageBox(nullptr, L"DirectX初期化失敗", L"原因特定", MB_OK);
 		return false;
 	}
 
@@ -66,13 +65,13 @@ bool Graphics::Init(HWND hwnd, int width, int height)
 	hr = s_swapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), (void**)&backBuffer);
 	if (FAILED(hr))
 	{
-		std::cout << "バックバッファー取得エラー";
+		MessageBox(nullptr, L"バックバッファー取得エラー", L"原因特定", MB_OK);
 		return false;
 	}
 	hr = s_device->CreateRenderTargetView(backBuffer.Get(), nullptr, &s_renderTargetView);
 	if (FAILED(hr))
 	{
-		std::cout << "レンダーターゲット作成エラー";
+		MessageBox(nullptr, L"レンダーターゲット作成エラー", L"原因特定", MB_OK);
 		return false;
 	}
 
@@ -94,16 +93,17 @@ bool Graphics::Init(HWND hwnd, int width, int height)
 	hr = D3DCompileFromFile(L"Shader.hlsl", nullptr, nullptr, "VS_Main", "vs_5_0", 0, 0, &vsBlob, &errorBlob);
 	if (FAILED(hr)) {
 		if (errorBlob) OutputDebugStringA((char*)errorBlob->GetBufferPointer());
-		std::cout << "頂点シェーダーの読み込みエラー";	// エラー内容をVSの出力に出す！
+		MessageBox(hwnd, L"頂点シェーダーの読み込みエラー", L"エラー", MB_OK);// エラー内容をVSの出力に出す！
 		return false;
 	}
 
 	// ピクセルシェーダーの読み込み
-	hr = D3DCompileFromFile(L"C:\\Users\\PC_User\\Desktop\\AT42A\\HEW\\HEW\\Shader.hlsl", nullptr, nullptr, "PS_Main", "ps_5_0", 0, 0, &psBlob, &errorBlob);
-	if (FAILED(hr)) 
+	hr = D3DCompileFromFile(L"Shader.hlsl", nullptr, nullptr, "PS_Main", "ps_5_0", 0, 0, &psBlob, &errorBlob);
+	if (FAILED(hr))
 	{
 		if (errorBlob) OutputDebugStringA((char*)errorBlob->GetBufferPointer());
-		std::cout << "ピクセルシェーダーの読み込みエラー";
+		MessageBox(hwnd, L"ピクセルシェーダーの読み込みエラー", L"エラー", MB_OK);
+		return false;
 	}
 
 	s_device->CreateVertexShader(vsBlob->GetBufferPointer(), vsBlob->GetBufferSize(), nullptr, &s_vertexShader);
@@ -126,7 +126,7 @@ bool Graphics::Init(HWND hwnd, int width, int height)
 	s_device->CreateBuffer(&bd, nullptr, &s_vertexBuffer);
 	if (FAILED(hr))
 	{
-		std::cout << "頂点バッファの作成エラー";
+		MessageBox(nullptr, L"頂点バッファの作成エラー", L"原因特定", MB_OK);
 		return false;
 	}
 
@@ -212,7 +212,7 @@ ComPtr<ID3D11ShaderResourceView> Graphics::LoadTexture(const wchar_t* filename)
 
 	ComPtr<ID3D11Texture2D> texture;
 	if (FAILED(s_device->CreateTexture2D(&desc, &initData, &texture))) return nullptr;
-	if(FAILED(s_device->CreateShaderResourceView(texture.Get(),nullptr,&srv))) return nullptr;
+	if (FAILED(s_device->CreateShaderResourceView(texture.Get(), nullptr, &srv))) return nullptr;
 
 	return srv;
 }
@@ -237,7 +237,7 @@ void Graphics::DrawRect(float x, float y, float w, float h, const ColorF& color)
 
 void Graphics::DrawImage(float x, float y, float w, float h, ComPtr<ID3D11ShaderResourceView> texture, const ColorF& color)
 {
-	if (!s_context || !s_vertexBuffer||!texture)return;
+	if (!s_context || !s_vertexBuffer || !texture)return;
 
 	float fWidth = (float)s_screenWidth;
 	float fHeight = (float)s_screenHeight;

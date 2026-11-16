@@ -124,16 +124,24 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="ActionInput.cpp" />
+    <ClCompile Include="CountJudgeMock.cpp" />
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="Graphics.cpp" />
     <ClCompile Include="Input.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="PlacementSimulator.cpp" />
+    <ClCompile Include="SaveData.cpp" />
     <ClCompile Include="Scene.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="BlockData.h" />
+    <ClInclude Include="CountJudgeMock.h" />
     <ClInclude Include="Game.h" />
     <ClInclude Include="Graphics.h" />
     <ClInclude Include="Input.h" />
+    <ClInclude Include="PlacementSimulator.h" />
+    <ClInclude Include="PuzzleConstants.h" />
+    <ClInclude Include="SaveData.h" />
     <ClInclude Include="Scene.h" />
   </ItemGroup>
   <ItemGroup>
