@@ -519,3 +519,475 @@ namespace Game
 	}
 
 }
+//平岡作player操作　合わせ
+/*
+#include "Game.h"
+void Game::Init(HWND hWnd)
+{
+    RendererInit(hWnd);
+    // プレイヤー
+    m_player.Init();
+    m_player.SetPos(-270.0f, -155.0f, 0.0f);
+    m_player.SetSize(30.0f, 40.0f, 1.0f);
+    m_player.SetColor(0.0f, 0.0f, 0.0f, 1.0f);
+    // 地面
+    m_ground.Init();
+    m_ground.SetPos(0.0f, -220.0f, 0.0f);
+    m_ground.SetSize(640.0f, 40.0f, 1.0f);
+    m_ground.SetColor(0.28f, 0.28f, 0.28f, 1.0f);
+    // 左上の固定足場
+    m_fixedPlatform.Init();
+    m_fixedPlatform.SetPos(-234.0f, 7.0f, 0.0f);
+    m_fixedPlatform.SetSize(176.0f, 70.0f, 1.0f);
+    m_fixedPlatform.SetColor(0.28f, 0.28f, 0.28f, 1.0f);
+    // 赤①
+    m_redLeftPlatform.Init();
+    m_redLeftPlatform.SetPos(-146.0f, -168.0f, 0.0f);
+    m_redLeftPlatform.SetSize(126.0f, 64.0f, 1.0f);
+    m_redLeftPlatform.SetColor(1.0f, 0.35f, 0.35f, 1.0f);
+    // 緑
+    m_greenPlatform.Init();
+    m_greenPlatform.SetPos(0.0f, -143.0f, 0.0f);
+    m_greenPlatform.SetSize(126.0f, 114.0f, 1.0f);
+    m_greenPlatform.SetColor(0.0f, 1.0f, 0.0f, 1.0f);
+    // 黄色
+    m_yellowPlatform.Init();
+    m_yellowPlatform.SetPos(110.0f, -113.0f, 0.0f);
+    m_yellowPlatform.SetSize(204.0f, 174.0f, 1.0f);
+    m_yellowPlatform.SetColor(1.0f, 0.85f, 0.0f, 1.0f);
+    // 赤②
+    m_redRightPlatform.Init();
+    m_redRightPlatform.SetPos(173.0f, -143.0f, 0.0f);
+    m_redRightPlatform.SetSize(222.0f, 114.0f, 1.0f);
+    m_redRightPlatform.SetColor(1.0f, 0.35f, 0.35f, 1.0f);
+    // 紫
+    m_purplePlatform.Init();
+    m_purplePlatform.SetPos(-50.0f, 7.0f, 0.0f);
+    m_purplePlatform.SetSize(196.0f, 70.0f, 1.0f);
+    m_purplePlatform.SetColor(0.65f, 0.2f, 0.9f, 1.0f);
+    // ガイドの色
+    // 薄いグレーで出現位置を表示する
+    // 赤①ガイド
+    m_redLeftGuide.Init();
+    m_redLeftGuide.SetPos(-146.0f, -168.0f, 0.0f);
+    m_redLeftGuide.SetSize(126.0f, 64.0f, 1.0f);
+    m_redLeftGuide.SetColor(0.65f, 0.65f, 0.65f, 1.0f);
+    // 緑ガイド
+    m_greenGuide.Init();
+    m_greenGuide.SetPos(0.0f, -143.0f, 0.0f);
+    m_greenGuide.SetSize(126.0f, 114.0f, 1.0f);
+    m_greenGuide.SetColor(0.65f, 0.65f, 0.65f, 1.0f);
+    // 黄色ガイド
+    m_yellowGuide.Init();
+    m_yellowGuide.SetPos(110.0f, -113.0f, 0.0f);
+    m_yellowGuide.SetSize(204.0f, 174.0f, 1.0f);
+    m_yellowGuide.SetColor(0.65f, 0.65f, 0.65f, 1.0f);
+    // 赤②ガイド
+    m_redRightGuide.Init();
+    m_redRightGuide.SetPos(173.0f, -143.0f, 0.0f);
+    m_redRightGuide.SetSize(222.0f, 114.0f, 1.0f);
+    m_redRightGuide.SetColor(0.65f, 0.65f, 0.65f, 1.0f);
+    // 紫ガイド
+    m_purpleGuide.Init();
+    m_purpleGuide.SetPos(-50.0f, 7.0f, 0.0f);
+    m_purpleGuide.SetSize(196.0f, 70.0f, 1.0f);
+    m_purpleGuide.SetColor(0.65f, 0.65f, 0.65f, 1.0f);
+
+    // ガイドの縁を作る
+    auto SetGuideFrame = [&](int index,
+        float x, float y, float w, float h,
+        float r, float g, float b)
+        {
+            float t = 3.0f; // 縁の太さ
+            // 上
+            m_guideFrames[index][0].Init();
+            m_guideFrames[index][0].SetPos(x, y + h / 2.0f - t / 2.0f, 0.0f);
+            m_guideFrames[index][0].SetSize(w, t, 1.0f);
+            m_guideFrames[index][0].SetColor(r, g, b, 1.0f);
+            // 下
+            m_guideFrames[index][1].Init();
+            m_guideFrames[index][1].SetPos(x, y - h / 2.0f + t / 2.0f, 0.0f);
+            m_guideFrames[index][1].SetSize(w, t, 1.0f);
+            m_guideFrames[index][1].SetColor(r, g, b, 1.0f);
+            // 左
+            m_guideFrames[index][2].Init();
+            m_guideFrames[index][2].SetPos(x - w / 2.0f + t / 2.0f, y, 0.0f);
+            m_guideFrames[index][2].SetSize(t, h, 1.0f);
+            m_guideFrames[index][2].SetColor(r, g, b, 1.0f);
+            // 右
+            m_guideFrames[index][3].Init();
+            m_guideFrames[index][3].SetPos(x + w / 2.0f - t / 2.0f, y, 0.0f);
+            m_guideFrames[index][3].SetSize(t, h, 1.0f);
+            m_guideFrames[index][3].SetColor(r, g, b, 1.0f);
+        };
+    // 赤①
+    SetGuideFrame(0, -146.0f, -168.0f, 126.0f, 64.0f, 1.0f, 0.35f, 0.35f);
+    // 緑
+    SetGuideFrame(1, 0.0f, -143.0f, 126.0f, 114.0f, 0.0f, 0.85f, 0.9f);
+    // 黄
+    SetGuideFrame(2, 110.0f, -113.0f, 204.0f, 174.0f, 1.0f, 0.85f, 0.0f);
+    // 赤②
+    SetGuideFrame(3, 173.0f, -143.0f, 222.0f, 114.0f, 1.0f, 0.35f, 0.35f);
+    // 紫
+    SetGuideFrame(4, -50.0f, 7.0f, 196.0f, 70.0f, 0.65f, 0.2f, 0.9f);}
+void Game::Update(void)
+{
+    input.Update();
+    // 死亡中の処理
+
+    // Rキーでリスタート
+    bool rNow = input.GetKeyPress(VK_R);
+    if (rNow && !m_rWasPressed)
+    {
+        // プレイヤーを初期位置に戻す
+        m_player.SetPos(-270.0f, -180.0f, 0.0f);
+        // プレイヤーの色を黒に戻す
+        m_player.SetColor(0.0f, 0.0f, 0.0f, 1.0f);
+        // ジャンプ状態をリセット
+        m_velocityY = 0.0f;
+        m_isGrounded = true;
+        m_spaceWasPressed = false;
+        // ブロックの番号とタイマーをリセット
+        m_blockNumber = 1;
+        m_blockTimer = 0;
+        // 死亡状態を解除
+        m_isDead = false;
+        m_rWasPressed = rNow;
+        return;
+    }
+    m_rWasPressed = rNow;
+
+    if (m_isDead)
+    {
+        /*if (input.GetKeyPress(VK_R))
+        {
+            m_isDead = false;
+            m_player.SetPos(-270.0f, -155.0f, 0.0f);
+            m_player.SetColor(0.0f, 0.0f, 0.0f, 1.0f);
+            m_velocityY = 0.0f;
+            m_isGrounded = true;
+            m_spaceWasPressed = false;
+        }*/
+
+
+/*
+return;
+    }
+    // ブロック切り替え
+    m_blockTimer++;
+    if (m_blockTimer >= 90)
+    {
+        m_blockTimer = 0;
+        m_blockNumber++;
+        if (m_blockNumber > 4)
+        {
+            m_blockNumber = 1;
+        }
+    }
+
+
+    // 消える前の20フレームでフェード
+    float fade = 0.0f;
+    if (m_blockTimer >= 70)
+    {
+        fade = (m_blockTimer - 70) / 20.0f;
+    }
+    // 元の色からガイドのグレー色へ徐々に変える
+    auto FadePlatform = [&](Object& platform,
+        float r, float g, float b)
+        {
+            float gray = 0.65f;
+            float newR = r + (gray - r) * fade;
+            float newG = g + (gray - g) * fade;
+            float newB = b + (gray - b) * fade;
+            platform.SetColor(newR, newG, newB, 1.0f);
+        };
+    // 現在のブロックをフェード
+    if (m_blockNumber == 1)
+    {
+        FadePlatform(m_redLeftPlatform, 1.0f, 0.35f, 0.35f);
+        FadePlatform(m_redRightPlatform, 1.0f, 0.35f, 0.35f);
+    }
+    else if (m_blockNumber == 2)
+    {
+        FadePlatform(m_greenPlatform, 0.0f, 1.0f, 0.0f);
+    }
+    else if (m_blockNumber == 3)
+    {
+        FadePlatform(m_yellowPlatform, 1.0f, 0.85f, 0.0f);
+    }
+    else if (m_blockNumber == 4)
+    {
+        FadePlatform(m_purplePlatform, 0.65f, 0.2f, 0.9f);
+    }
+
+
+    // 現在出現しているブロック
+    Object* activePlatforms[2];
+    int activeCount = 0;
+    if (m_blockNumber == 1)
+    {
+        activePlatforms[activeCount++] = &m_redLeftPlatform;
+        activePlatforms[activeCount++] = &m_redRightPlatform;
+    }
+    else if (m_blockNumber == 2)
+    {
+        activePlatforms[activeCount++] = &m_greenPlatform;
+    }
+    else if (m_blockNumber == 3)
+    {
+        activePlatforms[activeCount++] = &m_yellowPlatform;
+    }
+    else if (m_blockNumber == 4)
+    {
+        activePlatforms[activeCount++] = &m_purplePlatform;
+    }
+    // プレイヤー情報
+    DirectX::XMFLOAT3 pos = m_player.GetPos();
+    DirectX::XMFLOAT3 size = m_player.GetSize();
+    float halfWidth = size.x / 2.0f;
+    float halfHeight = size.y / 2.0f;
+    // 地面情報
+    DirectX::XMFLOAT3 groundPos = m_ground.GetPos();
+    DirectX::XMFLOAT3 groundSize = m_ground.GetSize();
+    DirectX::XMFLOAT3 previousPos = pos;
+    float groundTop = groundPos.y + groundSize.y / 2.0f;
+    // 足場の上にいるか確認
+    auto IsStandingOn = [&](Object& platform)
+        {
+            auto p = platform.GetPos();
+            auto s = platform.GetSize();
+            float left = p.x - s.x / 2.0f;
+            float right = p.x + s.x / 2.0f;
+            float top = p.y + s.y / 2.0f;
+            float bottom = pos.y - halfHeight;
+            return pos.x + halfWidth > left &&
+                pos.x - halfWidth < right &&
+                bottom >= top - 1.0f &&
+                bottom <= top + 1.0f;
+        };
+    // 着地状態
+    m_isGrounded =
+        (pos.y - halfHeight >= groundTop - 1.0f &&
+            pos.y - halfHeight <= groundTop + 1.0f);
+    if (IsStandingOn(m_fixedPlatform))
+    {
+        m_isGrounded = true;
+    }
+    if (m_blockTimer < 90)
+    {
+        for (int i = 0; i < activeCount; i++)
+        {
+            if (IsStandingOn(*activePlatforms[i]))
+            {
+                m_isGrounded = true;
+            }
+        }
+    }
+    // ジャンプ
+    bool spaceNow = input.GetKeyPress(VK_SPACE);
+    if (spaceNow && !m_spaceWasPressed && m_isGrounded)
+    {
+        m_velocityY = m_jumpPower;
+        m_isGrounded = false;
+    }
+    m_spaceWasPressed = spaceNow;
+    // 左右移動w
+    if (input.GetKeyPress(VK_A) ||
+        input.GetKeyPress(VK_LEFT))
+    {
+        pos.x -= m_moveSpeed;
+    }
+    if (input.GetKeyPress(VK_D) ||
+        input.GetKeyPress(VK_RIGHT))
+    {
+        pos.x += m_moveSpeed;
+    }
+    // 画面外制限
+    if (pos.x < -SCREEN_WIDTH / 2.0f + halfWidth)
+        pos.x = -SCREEN_WIDTH / 2.0f + halfWidth;
+    if (pos.x > SCREEN_WIDTH / 2.0f - halfWidth)
+        pos.x = SCREEN_WIDTH / 2.0f - halfWidth;
+    // 重力
+    if (!m_isGrounded)
+    {
+        m_velocityY -= m_gravity;
+        pos.y += m_velocityY;
+    }
+    else
+    {
+        m_velocityY = 0.0f;
+    }
+    // 足場との当たり判定
+    auto CheckCollision = [&](Object& platform)
+        {
+            auto p = platform.GetPos();
+            auto s = platform.GetSize();
+            float left = p.x - s.x / 2.0f;
+            float right = p.x + s.x / 2.0f;
+            float top = p.y + s.y / 2.0f;
+            float bottom = p.y - s.y / 2.0f;
+            float playerLeft = pos.x - halfWidth;
+            float playerRight = pos.x + halfWidth;
+            float playerTop = pos.y + halfHeight;
+            float playerBottom = pos.y - halfHeight;
+            float previousBottom = previousPos.y - halfHeight;
+            float previousTop = previousPos.y + halfHeight;
+            float previousLeft = previousPos.x - halfWidth;
+            float previousRight = previousPos.x + halfWidth;
+            // 横方向の重なり
+            float overlapX =
+                (playerRight < right ? playerRight : right) -
+                (playerLeft > left ? playerLeft : left);
+            // 縦方向の重なり
+            float overlapY =
+                (playerTop < top ? playerTop : top) -
+                (playerBottom > bottom ? playerBottom : bottom);
+            if (overlapX <= 0.0f || overlapY <= 0.0f)
+                return;
+            // めり込みすぎたら死亡
+            if (overlapX >= halfWidth &&
+                overlapY >= halfHeight)
+            {
+                m_isDead = true;
+                m_player.SetColor(1.0f, 0.0f, 0.0f, 1.0f);
+                return;
+            }
+            // 上から落ちてきた場合だけ着地
+            if (m_velocityY <= 0.0f &&
+                previousBottom >= top &&
+                playerBottom <= top)
+            {
+                pos.y = top + halfHeight;
+                m_velocityY = 0.0f;
+                m_isGrounded = true;
+                return;
+            }
+            // 下からブロックにぶつかった場合
+            if (m_velocityY > 0.0f &&
+                previousTop <= bottom &&
+                playerTop >= bottom)
+            {
+                pos.y = bottom - halfHeight;
+                m_velocityY = 0.0f;
+                return;
+            }
+            // 横からぶつかった場合
+            if (previousRight <= left)
+            {
+                pos.x = left - halfWidth;
+            }
+            else if (previousLeft >= right)
+            {
+                pos.x = right + halfWidth;
+            }
+            else
+            {
+                // 横からの衝突を優先して押し出す
+                if (pos.x < p.x)
+                    pos.x = left - halfWidth;
+                else
+                    pos.x = right + halfWidth;
+            }
+        };
+    // 固定足場との当たり判定
+    CheckCollision(m_fixedPlatform);
+    // 出現中のブロックとの当たり判定
+    if (m_blockTimer < 90)
+    {
+        for (int i = 0; i < activeCount; i++)
+        {
+            CheckCollision(*activePlatforms[i]);
+            if (m_isDead)
+            {
+                m_player.SetPos(pos.x, pos.y, pos.z);
+                return;
+            }
+        }
+    }
+    if (m_isDead)
+    {
+        m_player.SetPos(pos.x, pos.y, pos.z);
+        return;
+    }
+    // 地面との当たり判定
+    float playerBottom = pos.y - halfHeight;
+    if (playerBottom <= groundTop)
+    {
+        pos.y = groundTop + halfHeight;
+        m_velocityY = 0.0f;
+        m_isGrounded = true;
+    }
+    // プレイヤー位置更新
+    m_player.SetPos(pos.x, pos.y, pos.z);
+}
+void Game::Draw(void)
+{
+    RendererDrawStart();
+    // 地面
+    m_ground.Draw();
+    // 固定足場
+    m_fixedPlatform.Draw();
+    // 出現位置のガイド
+    m_redLeftGuide.Draw();
+    m_greenGuide.Draw();
+    m_yellowGuide.Draw();
+    m_redRightGuide.Draw();
+    m_purpleGuide.Draw();
+    // 数字に対応したブロック
+    if (m_blockNumber == 1)
+    {
+        m_redLeftPlatform.Draw();
+        m_redRightPlatform.Draw();
+    }
+    else if (m_blockNumber == 2)
+    {
+        m_greenPlatform.Draw();
+    }
+    else if (m_blockNumber == 3)
+    {
+        m_yellowPlatform.Draw();
+    }
+    else if (m_blockNumber == 4)
+    {
+        m_purplePlatform.Draw();
+    }
+
+    // ガイドの縁
+    for (int i = 0; i < 5; i++)
+    {
+        for (int j = 0; j < 4; j++)
+        {
+            m_guideFrames[i][j].Draw();
+        }
+    }
+    // プレイヤー
+    m_player.Draw();
+    RendererDrawEnd();
+}
+void Game::Uninit(void)
+{
+    m_player.Uninit();
+    m_ground.Uninit();
+    m_fixedPlatform.Uninit();
+    m_redLeftPlatform.Uninit();
+    m_greenPlatform.Uninit();
+    m_yellowPlatform.Uninit();
+    m_redRightPlatform.Uninit();
+    m_purplePlatform.Uninit();
+    m_redLeftGuide.Uninit();
+    m_greenGuide.Uninit();
+    m_yellowGuide.Uninit();
+    m_redRightGuide.Uninit();
+    m_purpleGuide.Uninit();
+    RendererUninit();
+
+    for (int i = 0; i < 5; i++)
+    {
+        for (int j = 0; j < 4; j++)
+        {
+            m_guideFrames[i][j].Uninit();
+        }
+    }
+}
+*/
