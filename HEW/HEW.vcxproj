@@ -132,6 +132,7 @@
     <ClCompile Include="Input.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="PlacementSimulator.cpp" />
+    <ClCompile Include="Player.cpp" />
     <ClCompile Include="SaveData.cpp" />
     <ClCompile Include="Scene.cpp" />
   </ItemGroup>
@@ -145,6 +146,7 @@
     <ClInclude Include="Graphics.h" />
     <ClInclude Include="Input.h" />
     <ClInclude Include="PlacementSimulator.h" />
+    <ClInclude Include="Player.h" />
     <ClInclude Include="PuzzleConstants.h" />
     <ClInclude Include="SaveData.h" />
     <ClInclude Include="Scene.h" />
