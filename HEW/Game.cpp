@@ -4,8 +4,9 @@
 #include "Scene.h"
 #include <iostream>
 
+//=================================================
 // パズル・判定モジュールおよび設定のインクルード
-// ==========================================
+// ================================================
 #include "BlockData.h"
 #include "PlacementSimulator.h"
 #include "CountJudgeMock.h"
@@ -172,15 +173,15 @@ namespace Game
 
 		if (texPlayer.Get() == nullptr)
 		{
-			MessageBox(nullptr, L"画像の読み込み失敗", L"警告", MB_OK);
+			cout << "画像の読み込み失敗\n";
 		}
 		if (texWhite.Get() == nullptr)
 		{
-			MessageBox(nullptr, L"siroiro.png の読み込み失敗", L"警告", MB_OK);
+			cout << "siroiro.png読み込み失敗\n";
 		}
 		else
 		{
-			MessageBox(nullptr, L"画像読み込み成功", L"成功", MB_OK);
+			cout << "画像読み込み成功\n";
 		}
 	}
 
@@ -303,8 +304,9 @@ namespace Game
 		// 使い方
 		// 普通に箱描画
 		// そして下の形式で入力する
-		// Graphics::DrawDashedBorder(playerX, playerY, 100.0f, 100.0f, Color::Red, 10.0f, 3.0f);
-		// そしたら描画できます
+		// 引数：(x座標, y座標, 幅, 高さ, 色, 点線の長さ, 太さ）
+		// 例 Graphics::DrawDashedBorder(playerX, playerY, 100.0f, 100.0f, Color::Red, 10.0f, 3.0f);
+		// これで描画できます
 		// =======================================================================================
 		
 		// 左上にスターの獲得数を表示
