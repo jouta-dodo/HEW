@@ -128,6 +128,7 @@
     <ClCompile Include="CountJudgeMock.cpp" />
     <ClCompile Include="CSVLoad.cpp" />
     <ClCompile Include="Game.cpp" />
+    <ClCompile Include="GameScene.cpp" />
     <ClCompile Include="Graphics.cpp" />
     <ClCompile Include="Input.cpp" />
     <ClCompile Include="main.cpp" />
@@ -135,6 +136,8 @@
     <ClCompile Include="Player.cpp" />
     <ClCompile Include="SaveData.cpp" />
     <ClCompile Include="Scene.cpp" />
+    <ClCompile Include="StageSelectScene.cpp" />
+    <ClCompile Include="TitleScene.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="BlockData.h" />
@@ -143,6 +146,7 @@
     <ClInclude Include="CountJudgeMock.h" />
     <ClInclude Include="CSVLoad.h" />
     <ClInclude Include="Game.h" />
+    <ClInclude Include="GameScene.h" />
     <ClInclude Include="Graphics.h" />
     <ClInclude Include="Input.h" />
     <ClInclude Include="PlacementSimulator.h" />
@@ -150,6 +154,8 @@
     <ClInclude Include="PuzzleConstants.h" />
     <ClInclude Include="SaveData.h" />
     <ClInclude Include="Scene.h" />
+    <ClInclude Include="StageSelectScene.h" />
+    <ClInclude Include="TitleScene.h" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Shader.hlsl">
