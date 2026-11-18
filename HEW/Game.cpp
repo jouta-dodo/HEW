@@ -13,6 +13,7 @@
 #include "Player.h"
 
 #include "CSVLoad.h"
+#include "BlockOperation.h"
 
 using namespace std;
 
@@ -46,6 +47,7 @@ namespace Game
 	Player player;
 
 	CSVLoad blockdata;
+	BlockOperation bo;
 
 	bool rWasPressed = false;
 
@@ -175,8 +177,11 @@ namespace Game
 		texPlayer = Graphics::LoadTexture(L"assets\\ui.png");
 		texWhite = Graphics::LoadTexture(L"assets\\siroiro.png");
 		player.Init(texPlayer);
+		bo.Init();
 
 		blockdata.LoadBlockCSV("assets/stage1.csv");
+
+		upperblockdata upperdata = bo.GetUpperBlockData();
 
 		if (texPlayer.Get() == nullptr)
 		{
@@ -226,7 +231,7 @@ namespace Game
 			}
 
 			// スペースキーでブロックを掴む・置く
-			bool isSpaceCurrent = (GetAsyncKeyState(VK_SPACE) & 0x8000) != 0;
+			bool isSpaceCurrent = (Input::IsKeyPressed(Key::Enter)) != 0;
 			if (isSpaceCurrent && !isSpacePressedLastFrame) {
 				simulator.ToggleGrab();
 				puzzleUpdated = true;
@@ -240,7 +245,7 @@ namespace Game
 			}
 
 			// プレイ開始キー（Enterキーでアクション側に移行）
-			if ((GetAsyncKeyState(VK_RETURN) & 0x8000)) {
+			if (Input::IsKeyPressed(Key::Enter)) {
 				currentPhase = GamePhase::Playing;
 				currentTick = 1;
 				tickTimer = 0.0f;

@@ -46,6 +46,14 @@ void BlockOperation::Init()
 	//		m_lowerdata[x][y][lowerUnselected] = blockdata.GetBlockData(y, x);
 	//	}
 	//}
+	for (int x = 0;x < lowerWidth;x++)
+	{
+		for (int y = 0;y < lowerHeight;y++)
+		{
+			m_lowerdata[x][y][lowerUnselected] = blockdata.GetBlockData(y, x);
+		}
+	}
+
 }
 
 //void BlockOperation::InitBlocks(Object& block, float posx, float posy, int size)
@@ -289,7 +297,7 @@ void BlockOperation::upperSelectBlock()
 		upperSelectMove(-1, 0);
 	}
 
-	if (Input::IsKeyPressed(Key::A))
+	if (Input::IsKeyPressed(Key::D))
 	{
 		upperSelectMove(1, 0);
 	}
@@ -765,4 +773,24 @@ int BlockOperation::GetCurrentPhase()
 		break;
 	}
 	return 0;
+}
+
+int BlockOperation::GetUpperBlockData(int x, int y)
+{
+	return m_upperdata[x][y][upperFixing];
+}
+
+std::array<std::array<int, upperHeight>, upperWidth> BlockOperation::GetUpperBlockData()
+{
+	std::array<std::array<int, upperHeight>, upperWidth> tmp = {};
+
+	for (int x = 0;x < upperWidth;x++)
+	{
+		for (int y = 0;y < upperHeight ; y++)
+		{
+			tmp[x][y] = m_upperdata[x][y][upperFixing];
+		}
+	}
+
+	return tmp;
 }

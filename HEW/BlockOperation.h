@@ -1,9 +1,14 @@
 #pragma once
 #include "CSVLoad.h"
 #include "contents.h"
+#include <iostream>
+#include <vector>
+
+using upperblockdata = std::array<std::array<int, upperHeight>, upperWidth>;
 
 class BlockOperation
 {
+private:
 	//Object m_player; // プレイヤーのオブジェクト
 	//Object m_background; // 背景のオブジェクト
 	//Object m_upperMovingblock[upperWidth][upperHeight];
@@ -107,6 +112,20 @@ public:
 	bool isSelect = false;
 
 	int GetCurrentPhase();
+
+	//上のデータを１マスを返り値にする
+	// 例）
+	//int a = GetUpperBlockData(0,0);
+	//にしたらaに上の画面の配列の0,0のデータが入る
+	int GetUpperBlockData(int x,int y);
+
+	//上のデータの配列全体が返り値になってる
+	//upperblockdataで変数を作って、それにBlockOperationのオブジェクトからこの関数を呼び出すと変数に上の画面のデータを入れれる
+	//例）
+	//BlockOperation b;
+	//upperblockdata data = b.GetUpperBlockData();
+	//int a = data[x][y];	//←dataはx,yの順番でその配列を見れる
+	upperblockdata GetUpperBlockData();
 
 	bool isMove = false;
 	bool isSet = false;
