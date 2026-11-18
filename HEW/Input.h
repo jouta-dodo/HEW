@@ -7,7 +7,7 @@
 #include<functional>
 #pragma comment(lib,"xinput.lib")
 
-enum class Key { Up, Down, Left,Right,Space,Enter,Escape,Shift,W,A,S,D,Z,X,C };
+enum class Key { Up, Down, Left, Right, Space, Enter, E, Escape, Shift, W, A, S, D, Z, X, C };
 enum class Button{Up,Down,Left,Right,A,B,X,Y,Start,Back,L1,R1};
 
 

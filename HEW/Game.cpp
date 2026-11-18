@@ -182,7 +182,7 @@ namespace Game
 		blockdata.LoadBlockCSV("assets/stage1.csv");
 
 		upperblockdata upperdata = bo.GetUpperBlockData();
-
+		/*
 		if (texPlayer.Get() == nullptr)
 		{
 			MessageBox(nullptr, L"画像の読み込み失敗", L"警告", MB_OK);
@@ -195,6 +195,7 @@ namespace Game
 		{
 			MessageBox(nullptr, L"画像読み込み成功", L"成功", MB_OK);
 		}
+		*/
 	}
 
 	//=========
@@ -206,6 +207,9 @@ namespace Game
 		// ==========================================
 		if (currentPhase == GamePhase::Setup)
 		{
+			// 配置フェーズ中もプレイヤーに重力だけを適用する
+			player.UpdateGravity(PuzzleConstants::WindowWidth, 720.0f);
+
 			bool puzzleUpdated = false;
 
 			// WASDまたは矢印キーでブロック/フォーカス単位の移動
@@ -231,7 +235,7 @@ namespace Game
 			}
 
 			// スペースキーでブロックを掴む・置く
-			bool isSpaceCurrent = (Input::IsKeyPressed(Key::Enter)) != 0;
+			bool isSpaceCurrent = Input::IsKeyHeld(Key::Space);
 			if (isSpaceCurrent && !isSpacePressedLastFrame) {
 				simulator.ToggleGrab();
 				puzzleUpdated = true;
@@ -244,8 +248,8 @@ namespace Game
 				puzzleUpdated = true;
 			}
 
-			// プレイ開始キー（Enterキーでアクション側に移行）
-			if (Input::IsKeyPressed(Key::Enter)) {
+			// プレイ開始キー（Eキーでアクション側に移行）
+			if (Input::IsKeyPressed(Key::E)) {
 				currentPhase = GamePhase::Playing;
 				currentTick = 1;
 				tickTimer = 0.0f;
@@ -254,7 +258,7 @@ namespace Game
 				// プレイ開始時に一度だけコンソールを整理
 				system("cls");
 				cout << "=== 【フェーズ: アクション・プレイ中】 ===\n";
-				cout << "([Q] キーを押すと配置フェーズに戻ります)\n\n";
+				cout << "([E] キーで配置フェーズに戻ります)\n\n";
 			}
 
 			if (puzzleUpdated) {
@@ -463,6 +467,7 @@ namespace Game
 			for (int y = 0; y < GRID_HEIGHT; y++)
 			{
 				int gx = currentTick - 1;
+				// gx の範囲チェックを追加
 				if (gx >= 0 && gx < GRID_WIDTH)
 				{
 					float drawX = puzzleStartX + gx * (cellSize + cellSpacing);

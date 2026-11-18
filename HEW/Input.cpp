@@ -42,6 +42,7 @@ namespace
 		case Key::Right: return VK_RIGHT;
 		case Key::Space: return VK_SPACE;
 		case Key::Enter: return VK_RETURN;
+		case Key::E: return 'E';
 		case Key::Escape: return VK_ESCAPE;
 		case Key::Shift: return VK_SHIFT;
 		case Key::W: return 'W';
