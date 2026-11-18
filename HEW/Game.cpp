@@ -11,6 +11,9 @@
 #include "PlacementSimulator.h"
 #include "CountJudgeMock.h"
 #include "PuzzleConstants.h" //統合した定数ファイル
+#include "Player.h"
+
+#include "CSVLoad.h"
 
 using namespace std;
 
@@ -40,10 +43,12 @@ namespace Game
 {
 	enum class Cmd { Jump, MoveLeft, MoveRight };
 	ComPtr<ID3D11ShaderResourceView> texPlayer;
-	ComPtr<ID3D11ShaderResourceView> texWhite; //白の正方形画像 名前は　siroiro.png
+	ComPtr<ID3D11ShaderResourceView> texWhite; //白の正方形画像 名前は siroiro.png
+	Player player;
 
-	float playerX = 640.0f - 50.0f;
-	float playerY = 360.0f - 50.0f;
+	CSVLoad blockdata;
+
+	bool rWasPressed = false;
 
 	bool IsOverlapping(
 		float x1,
@@ -71,7 +76,7 @@ namespace Game
 
 	// ティック自動進行用のタイマー（1.5秒ごとに次の列へ）
 	float tickTimer = 0.0f;
-	const float tickInterval = 1.5f;
+	const float tickInterval = 0.5f; // ← ここでスピードを変更できます
 
 	// 画面のチカチカを防ぐための「描画更新フラグ」
 	bool needsRedraw = true;
@@ -170,6 +175,9 @@ namespace Game
 		//==============
 		texPlayer = Graphics::LoadTexture(L"assets\\ui.png");
 		texWhite = Graphics::LoadTexture(L"assets\\siroiro.png");
+		player.Init(texPlayer);
+
+		blockdata.LoadBlockCSV("assets/stage1.csv");
 
 		if (texPlayer.Get() == nullptr)
 		{
@@ -190,7 +198,6 @@ namespace Game
 	//=========
 	void Update()
 	{
-
 		//  パズル配置フェーズ
 		// ==========================================
 		if (currentPhase == GamePhase::Setup)
@@ -239,6 +246,11 @@ namespace Game
 				currentTick = 1;
 				tickTimer = 0.0f;
 				needsRedraw = true;
+
+				// プレイ開始時に一度だけコンソールを整理
+				system("cls");
+				cout << "=== 【フェーズ: アクション・プレイ中】 ===\n";
+				cout << "([Q] キーを押すと配置フェーズに戻ります)\n\n";
 			}
 
 			if (puzzleUpdated) {
@@ -255,13 +267,18 @@ namespace Game
 		// ==========================================
 		else if (currentPhase == GamePhase::Playing)
 		{
-			// メンバーが書いたプレイヤー移動処理
-			if (Input::IsHeld(Cmd::MoveLeft)) {
-				playerX -= 5.0f;
+			player.Update(PuzzleConstants::WindowWidth, 720.0f);
+
+			// Rキーでプレイヤーのリスタート
+			bool rNow = (GetAsyncKeyState('R') & 0x8000) != 0;
+			if (rNow && !rWasPressed)
+			{
+				player.SetPos(590.0f, 310.0f);
+				player.SetVelocityY(0.0f);
+				player.SetGrounded(true);
+				player.SetDead(false);
 			}
-			if (Input::IsHeld(Cmd::MoveRight)) {
-				playerX += 5.0f;
-			}
+			rWasPressed = rNow;
 
 			// スピードを落としたタイマーで順番にループチェック
 			tickTimer += 1.0f / 60.0f;
@@ -271,7 +288,11 @@ namespace Game
 				if (currentTick > GRID_WIDTH) {
 					currentTick = 1; // 1〜5列目を周回
 				}
-				needsRedraw = true;
+
+				// 【軽量化のポイント】
+				// Playing中は画面クリア(system("cls"))を行わず、必要な判定評価のみ軽く出力するように変更
+				cout << "現在のティック: " << currentTick << " 列目をチェック中\n";
+				judgeSystem.EvaluateColumn(currentTick);
 			}
 
 			// Qキーで配置フェーズに戻る
@@ -282,10 +303,10 @@ namespace Game
 
 			if (!stageStarCollected &&
 				IsOverlapping(
-					playerX,
-					playerY,
-					100.0f,
-					100.0f,
+					player.GetX(),
+					player.GetY(),
+					player.GetWidth(),
+					player.GetHeight(),
 					PuzzleConstants::StageStarX,
 					PuzzleConstants::StageStarY,
 					PuzzleConstants::StageStarSize,
@@ -308,12 +329,12 @@ namespace Game
 		// 例 Graphics::DrawDashedBorder(playerX, playerY, 100.0f, 100.0f, Color::Red, 10.0f, 3.0f);
 		// これで描画できます
 		// =======================================================================================
-		
+
 		// 左上にスターの獲得数を表示
 		DrawStarCount();
 
-		// メンバーが作ったプレイヤー画像の描画
-		Graphics::DrawImage(playerX, playerY, 100.0f, 100.0f, texPlayer, Color::White);
+		// プレイヤー画像の描画
+		player.Draw();
 
 		// スター1の描画
 		if (!stageStarCollected)
@@ -484,31 +505,23 @@ namespace Game
 		// ==========================================
 		// コンソール画面側の描画（確認用ログ）
 		// ==========================================
-		if (needsRedraw)
+		// 【軽量化のポイント】
+		// Playingフェーズ中は system("cls") を行わず、Setupフェーズで操作・配置変更があったときのみ
+		// 画面全体をクリアして描画するように分離しました。
+		if (currentPhase == GamePhase::Setup && needsRedraw)
 		{
 			system("cls");
 
-			if (currentPhase == GamePhase::Setup)
-			{
-				cout << "=== 【フェーズ: パズル配置】 ===\n";
-				simulator.DrawGrid();
+			cout << "=== 【フェーズ: パズル配置】 ===\n";
+			simulator.DrawGrid();
 
-				if (heldIdx != -1) {
-					cout << "\n状態: 【ブロック移動中】 (スペースキーで配置)\n";
-				}
-				else {
-					cout << "\n状態: 【ブロック選択中】 (W/A/S/Dで選択, スペースで掴む)\n";
-				}
-				cout << "操作: [W/A/S/D]移動  [Space]決定/解除  [R]リセット  [Enter]プレイ開始\n";
+			if (heldIdx != -1) {
+				cout << "\n状態: 【ブロック移動中】 (スペースキーで配置)\n";
 			}
-			else if (currentPhase == GamePhase::Playing)
-			{
-				cout << "ティック 1-5 周回中（ゲーム画面右端で操作・確認できます）\n";
-				cout << "([Q] キーを押すと配置フェーズに戻ります)\n\n";
-
-				cout << "現在のティック: " << currentTick << " 列目をチェック中\n";
-				judgeSystem.EvaluateColumn(currentTick);
+			else {
+				cout << "\n状態: 【ブロック選択中】 (W/A/S/Dで選択, スペースで掴む)\n";
 			}
+			cout << "操作: [W/A/S/D]移動  [Space]決定/解除  [R]リセット  [Enter]プレイ開始\n";
 
 			needsRedraw = false;
 		}
