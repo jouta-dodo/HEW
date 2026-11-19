@@ -1,4 +1,5 @@
 ﻿#include "GameScene.h"
+#include "StageSelectScene.h"
 #include <iostream>
 
 using namespace std;
@@ -45,28 +46,24 @@ void GameScene::DrawDigit(int digit, float x, float y, float size, const ColorF&
 
 void GameScene::DrawStarCount()
 {
-    const int collectedCount = (stageStarCollected ? 1 : 0) + (puzzleStarCollected ? 1 : 0);
+    const int collectedCount =
+        (stageStarCollected ? 1 : 0) +
+        (clearStarCollected ? 1 : 0) +
+        (tickStarCollected ? 1 : 0);
+
     const float x = 24.0f;
     const float y = 24.0f;
     const float digitSize = 28.0f;
     const ColorF countColor(255, 215, 0);
 
     DrawDigit(collectedCount, x, y, digitSize, countColor);
-    Graphics::DrawRect(x + 54.0f, y + 13.0f, 24.0f, 4.0f, Color::White);
-    DrawDigit(2, x + 84.0f, y, digitSize, Color::White);
-}
-
-void GameScene::OnStageCleared()
-{
-    if (puzzleStarCollected) return;
-
-    if (simulator.CheckPuzzleStarCondition(
-        PuzzleConstants::PuzzleStarTargetX,
-        PuzzleConstants::PuzzleStarTargetY))
-    {
-        puzzleStarCollected = true;
-        std::cout << "\n★ スター2を獲得しました！\n";
-    }
+    Graphics::DrawRect(
+        x + 54.0f,
+        y + 13.0f,
+        24.0f,
+        4.0f,
+        Color::White);
+    DrawDigit(3, x + 84.0f, y, digitSize, Color::White);
 }
 
 void GameScene::Init()
@@ -136,6 +133,7 @@ void GameScene::Update()
             currentPhase = GamePhase::Playing;
             currentTick = 1;
             tickTimer = 0.0f;
+            tickLoopCount = 1;
             needsRedraw = true;
 
             // プレイ開始時に一度だけコンソールを整理
@@ -157,6 +155,16 @@ void GameScene::Update()
     // ==========================================
     else if (currentPhase == GamePhase::Playing)
     {
+        if (resultShown)
+        {
+            if (Input::IsKeyPressed(Key::Space))
+            {
+                SceneManager::ChangeScene(new StageSelectScene());
+            }
+
+            return;
+        }
+
         player.Update(PuzzleConstants::WindowWidth, 720.0f);
 
         // Rキーでプレイヤーのリスタート
@@ -176,14 +184,14 @@ void GameScene::Update()
             tickTimer = 0.0f;
             currentTick++;
             if (currentTick > GRID_WIDTH) {
-                currentTick = 1; // 1〜5列目を周回
+                currentTick = 1;
+                tickLoopCount++;
             }
-
-            // 【軽量化のポイント】
-            // Playing中は画面クリア(system("cls"))を行わず、必要な判定評価のみ軽く出力するように変更
-            cout << "現在のティック: " << currentTick << " 列目をチェック中\n";
-            judgeSystem.EvaluateColumn(currentTick);
         }
+
+        
+        //cout << "現在のティック: " << currentTick << " 列目をチェック中\n";
+        judgeSystem.EvaluateColumn(currentTick);
 
         // Qキーで配置フェーズに戻る
         if ((GetAsyncKeyState('Q') & 0x8000)) {
@@ -193,12 +201,53 @@ void GameScene::Update()
 
         if (!stageStarCollected &&
             IsOverlapping(
-                player.GetX(), player.GetY(), player.GetWidth(), player.GetHeight(),
-                PuzzleConstants::StageStarX, PuzzleConstants::StageStarY,
-                PuzzleConstants::StageStarSize, PuzzleConstants::StageStarSize))
+                player.GetX(), player.GetY(),
+                player.GetWidth(), player.GetHeight(),
+                PuzzleConstants::StageStarX,
+                PuzzleConstants::StageStarY,
+                PuzzleConstants::StageStarSize,
+                PuzzleConstants::StageStarSize))
         {
             stageStarCollected = true;
-            std::cout << "\n スター1を獲得しました！\n";
+            std::cout << "\nスター1を獲得しました！\n";
+        }
+
+        // ゴールに触れたらリザルトを表示
+        if (!resultShown &&
+            IsOverlapping(
+                player.GetX(), player.GetY(),
+                player.GetWidth(), player.GetHeight(),
+                PuzzleConstants::GoalX,
+                PuzzleConstants::GoalY,
+                PuzzleConstants::GoalWidth,
+                PuzzleConstants::GoalHeight))
+        {
+            // ゴール到達スター
+            clearStarCollected = true;
+
+            // 3ティックループ以内のゴールスター
+            if (tickLoopCount <= 5)
+            {
+                tickStarCollected = true;
+                
+            }
+
+            
+
+            resultShown = true;
+
+            const int collectedCount =
+                (stageStarCollected ? 1 : 0) +
+                (clearStarCollected ? 1 : 0) +
+                (tickStarCollected ? 1 : 0);
+
+            std::cout << "\n ステージクリア \n";
+            std::cout << "経過ティックループ: "
+                      << tickLoopCount
+                      << "\n";
+            std::cout << "獲得スター: "
+                      << collectedCount
+                      << " / 3\n";
         }
     }
 }
@@ -216,6 +265,15 @@ void GameScene::Draw()
 
     // 左上にスターの獲得数を表示
     DrawStarCount();
+
+    // ゴールオブジェクト
+    Graphics::DrawImage(
+        PuzzleConstants::GoalX,
+        PuzzleConstants::GoalY,
+        PuzzleConstants::GoalWidth,
+        PuzzleConstants::GoalHeight,
+        texWhite,
+        Color::Green);
 
     // プレイヤー画像の描画
     player.Draw();
@@ -261,16 +319,14 @@ void GameScene::Draw()
             float drawX = puzzleStartX + x * (cellSize + cellSpacing);
             float drawY = puzzleStartY + y * (cellSize + cellSpacing);
 
-            // ① 壁のチェック
             if (simulator.IsWall(x, y)) {
                 Graphics::DrawImage(drawX, drawY, cellSize, cellSize, baseTex, wallColor);
             }
-            // ② ブロックが存在する場合
             else if (currentGrid[x][y].hasBlock) {
                 ColorF cellColor = GetColorFromFramework(currentGrid[x][y].color);
                 Graphics::DrawImage(drawX, drawY, cellSize, cellSize, baseTex, cellColor);
             }
-            // ③ 固定ギミックのチェック（ブロックが乗っていない場合）
+            // 固定ギミックのチェック
             else {
                 FrameworkColor gColor = simulator.GetFixedGimmick(x, y);
                 if (gColor != FrameworkColor::None) {
@@ -286,17 +342,7 @@ void GameScene::Draw()
         }
     }
 
-    // スター2の描画（壁の右横）
-    if (!puzzleStarCollected)
-    {
-        float starX = puzzleStartX + PuzzleConstants::PuzzleStarTargetX * (cellSize + cellSpacing);
-        float starY = puzzleStartY + PuzzleConstants::PuzzleStarTargetY * (cellSize + cellSpacing);
-        float starOffset = (cellSize - PuzzleConstants::PuzzleStarSize) / 2.0f;
-        Graphics::DrawImage(
-            starX + starOffset, starY + starOffset,
-            PuzzleConstants::PuzzleStarSize, PuzzleConstants::PuzzleStarSize,
-            baseTex, Color::Yellow);
-    }
+    
 
     // 2. 選択中のブロックに対する「白枠（またはオレンジ枠）」のハイライト表示
     if (currentPhase == GamePhase::Setup)
@@ -353,7 +399,7 @@ void GameScene::Draw()
         }
     }
 
-    // 3. パズル盤面のすぐ下に「その列にある複数のブロックの色」を積み上げて描画
+    // パズル盤面のすぐ下に「その列にある複数のブロックの色」を積み上げて描画
     float resultBarY = puzzleStartY + GRID_HEIGHT * (cellSize + cellSpacing) + 12.0f;
     float subBoxSize = cellSize / 3.0f - 2.0f;
 
@@ -402,4 +448,136 @@ void GameScene::Draw()
 
         needsRedraw = false;
     }
+
+    if (resultShown)
+    {
+        DrawResultOverlay();
+    }
+}
+
+void GameScene::DrawResultOverlay()
+{
+    const int collectedCount =
+        (stageStarCollected ? 1 : 0) +
+        (clearStarCollected ? 1 : 0) +
+        (tickStarCollected ? 1 : 0);
+
+    const float panelX = 300.0f;
+    const float panelY = 120.0f;
+    const float panelWidth = 680.0f;
+    const float panelHeight = 440.0f;
+
+    // 背景パネル
+    Graphics::DrawRect(
+        panelX,
+        panelY,
+        panelWidth,
+        panelHeight,
+        ColorF(0.08f, 0.08f, 0.12f, 0.95f));
+
+    // パネルの枠
+    const float border = 8.0f;
+
+    Graphics::DrawRect(
+        panelX,
+        panelY,
+        panelWidth,
+        border,
+        Color::Yellow);
+
+    Graphics::DrawRect(
+        panelX,
+        panelY + panelHeight - border,
+        panelWidth,
+        border,
+        Color::Yellow);
+
+    Graphics::DrawRect(
+        panelX,
+        panelY,
+        border,
+        panelHeight,
+        Color::Yellow);
+
+    Graphics::DrawRect(
+        panelX + panelWidth - border,
+        panelY,
+        border,
+        panelHeight,
+        Color::Yellow);
+
+    // タイトルバー
+    Graphics::DrawRect(
+        panelX + 150.0f,
+        panelY + 45.0f,
+        380.0f,
+        18.0f,
+        Color::White);
+
+    // 3種類のスターを表示
+    const float starSize = 64.0f;
+    const float starY = panelY + 145.0f;
+    const float firstStarX = panelX + 125.0f;
+
+    const bool stars[3] = {
+        stageStarCollected,
+        clearStarCollected,
+        tickStarCollected
+    };
+
+    for (int i = 0; i < 3; i++)
+    {
+        const ColorF starColor = stars[i]
+            ? Color::Yellow
+            : ColorF(0.25f, 0.25f, 0.25f, 1.0f);
+
+        Graphics::DrawImage(
+            firstStarX + i * 150.0f,
+            starY,
+            starSize,
+            starSize,
+            texWhite,
+            starColor);
+    }
+
+    // 獲得数 / 3
+    DrawDigit(
+        collectedCount,
+        panelX + 245.0f,
+        panelY + 285.0f,
+        52.0f,
+        Color::Yellow);
+
+    Graphics::DrawRect(
+        panelX + 345.0f,
+        panelY + 310.0f,
+        40.0f,
+        7.0f,
+        Color::White);
+
+    DrawDigit(
+        3,
+        panelX + 425.0f,
+        panelY + 285.0f,
+        52.0f,
+        Color::White);
+
+    // スペースキー待機表示
+    Graphics::DrawRect(
+        panelX + 120.0f,
+        panelY + 385.0f,
+        440.0f,
+        18.0f,
+        Color::Green);
+    // ゴール到達スター
+    clearStarCollected = true;
+
+    // 5ティックループ以内のゴールスター
+    if (tickLoopCount <= 5)
+    {
+        tickStarCollected = true;
+        
+    }
+
+    resultShown = true;
 }
