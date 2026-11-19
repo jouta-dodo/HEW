@@ -1,6 +1,7 @@
 #include "BlockOperation.h"
 #include "Input.h"
 #include <ctime>
+#include"Graphics.h"
 
 void BlockOperation::Init(ComPtr<ID3D11ShaderResourceView> texture)
 {

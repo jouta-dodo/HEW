@@ -1,6 +1,5 @@
 #pragma once
 #include "CSVLoad.h"
-#include "Graphics.h"
 #include "contents.h"
 #include <iostream>
 #include <vector>
@@ -133,6 +132,7 @@ public:
 
 	// ƒQ[ƒ€XVˆ—
 	void Update();
+	//void SetColor();
 	// •`‰æˆ—
 	void Draw();
 
