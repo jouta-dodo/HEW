@@ -2,6 +2,9 @@
 #include "Input.h"
 #include <ctime>
 #include"Graphics.h"
+#include"Game.h"
+#include"Scene.h"
+#include"TitleScene.h"
 
 void BlockOperation::Init(ComPtr<ID3D11ShaderResourceView> texture)
 {
