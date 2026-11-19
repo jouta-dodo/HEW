@@ -16,6 +16,7 @@ enum class BlockType
 	rightblue,
 	rightyellow,
 	black,
+	white,
 };
 //
 //enum class BlockState
@@ -125,9 +126,11 @@ private:
 
 	//リセットできるはず
 	void ResetBlocks();
+
+	ComPtr<ID3D11ShaderResourceView> blocktexture;
 public:
 	// 初期化処理
-	void Init();
+	void Init(ComPtr<ID3D11ShaderResourceView> texture);
 
 	// ゲーム更新処理
 	void Update();
@@ -139,6 +142,9 @@ public:
 	void Uninit();
 
 	bool isSelect = false;
+
+	int GetUpperBlockState(int x, int y);
+	int GetLowerBlockState(int x, int y);
 
 	int GetCurrentPhase();
 
