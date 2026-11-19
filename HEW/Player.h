@@ -9,6 +9,7 @@ public:
 
 	void Init(ComPtr<ID3D11ShaderResourceView> texture);
 	void Update(float screenWidth, float screenHeight);
+	void UpdateGravity(float screenWidth, float screenHeight);
 	void Draw();
 	void Uninit();
 

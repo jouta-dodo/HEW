@@ -7,9 +7,9 @@ Player::Player()
 	, m_width(100.0f), m_height(100.0f)
 	, m_previousX(0.0f), m_previousY(0.0f)
 	, m_velocityY(0.0f)
-	, m_moveSpeed(10.0f)
+	, m_moveSpeed(14.0f)
 	, m_jumpPower(12.0f)
-	, m_gravity(0.5f)
+	, m_gravity(0.8f)
 	, m_isGrounded(false)
 	, m_isDead(false)
 	, m_spaceWasPressed(false)
@@ -64,10 +64,21 @@ void Player::Update(float screenWidth, float screenHeight)
 	}
 	m_spaceWasPressed = spaceNow;
 
+	UpdateGravity(screenWidth, screenHeight);
+}
+
+void Player::UpdateGravity(float screenWidth, float screenHeight)
+{
+	if (m_isDead) return;
+
+	m_previousY = m_y;
+
 	const float platformX1 = 100.0f;
 	const float platformX2 = screenWidth - 100.0f;
 	const float platformY = 450.0f;
-	const bool overlapsPlatform = m_x + m_width >= platformX1 && m_x <= platformX2;
+	const bool overlapsPlatform =
+		m_x + m_width >= platformX1 &&
+		m_x <= platformX2;
 
 	if (m_isGrounded && !overlapsPlatform)
 	{
@@ -82,8 +93,11 @@ void Player::Update(float screenWidth, float screenHeight)
 		m_y -= m_velocityY;
 
 		const float footY = m_y + m_height;
-		if (m_velocityY <= 0.0f && overlapsPlatform &&
-			previousFootY <= platformY && footY >= platformY)
+
+		if (m_velocityY <= 0.0f &&
+			overlapsPlatform &&
+			previousFootY <= platformY &&
+			footY >= platformY)
 		{
 			m_y = platformY - m_height;
 			m_velocityY = 0.0f;
