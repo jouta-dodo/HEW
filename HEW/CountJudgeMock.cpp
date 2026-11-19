@@ -30,6 +30,8 @@ void CountJudgeMock::EvaluateColumn(int tick) const {
             hasAnyBlock = true;
             int colorId = (int)boardGrid[targetColumn][y].color;
 
+
+            // switchï∂Ç≈Ç©Ç¢Çƒ
             std::string colorName = "ïsñæ";
             if (colorId == 1) colorName = "ê‘(1)";
             else if (colorId == 2) colorName = "ê¬(2)";
