@@ -124,6 +124,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="ActionInput.cpp" />
+    <ClCompile Include="Audio.cpp" />
     <ClCompile Include="BlockOperation.cpp" />
     <ClCompile Include="CountJudgeMock.cpp" />
     <ClCompile Include="CSVLoad.cpp" />

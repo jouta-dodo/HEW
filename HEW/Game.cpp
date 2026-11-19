@@ -175,6 +175,28 @@ namespace Game
 		{
 			MessageBox(nullptr, L"画像読み込み成功", L"成功", MB_OK);
 		}
+
+		//==============
+		//音の読み込み
+		// 
+		// 使い方
+		// 例
+		// Audio::Load(L"assets\\stage1.mp3,L"BgmStage1");
+		// Audio::Load(L"assets\\jump.wav",L"SeJump")
+		// こうやってファイルパス入力してその音源の名前決めます
+		// 
+		// 鳴らすときは
+		// BGMなら
+		// Audio::PlayBGM(L"BgmStage1");
+		// 
+		// SEなら
+		// Audio::PlaySE(L"SeJump")
+		// こうやったら使えます
+		// 
+		// Inutで呼ぶのはＢＧＭ
+		// 効果音は必ずUpdateで呼ぶこと
+		//==============
+
 	}
 
 	void Update()

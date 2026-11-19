@@ -25,5 +25,18 @@ void Audio::PlayBGM(const std::wstring& alias)
 	std::wstring cmdReset = L"seek" + alias + L"to start";
 	mciSendStringW(cmdReset.c_str(), nullptr, 0, nullptr);
 
+	std::wstring cmdPlay = L"play" + alias + L"repeat";
+	mciSendStringW(cmdPlay.c_str(), nullptr, 0, nullptr);
+}
 
+void Audio::Stop(const std::wstring& alias)
+{
+	std::wstring cmd = L"stop" + alias;
+	mciSendStringW(cmd.c_str(), nullptr, 0, nullptr);
+}
+
+//‘S•”Ž~‚ß‚é‚â‚Â
+void Audio::StopAll()
+{
+	mciSendStringW(L"stop all", nullptr, 0, nullptr);
 }
