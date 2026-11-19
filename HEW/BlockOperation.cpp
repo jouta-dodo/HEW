@@ -290,6 +290,7 @@ void BlockOperation::Draw()
 			Graphics::DrawImage(startX + x * (lowerBlockSize + space), startY + y * (lowerBlockSize + space), lowerBlockSize, lowerBlockSize, blocktexture, blockColor);
 		}
 	}
+
 	// ƒQ[ƒ€ˆ—Às
 	//RendererDrawStart();
 
