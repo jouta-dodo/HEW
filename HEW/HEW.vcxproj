@@ -138,6 +138,7 @@
     <ClCompile Include="SaveData.cpp" />
     <ClCompile Include="Scene.cpp" />
     <ClCompile Include="StageSelectScene.cpp" />
+    <ClCompile Include="TickManager.cpp" />
     <ClCompile Include="TitleScene.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -157,6 +158,7 @@
     <ClInclude Include="SaveData.h" />
     <ClInclude Include="Scene.h" />
     <ClInclude Include="StageSelectScene.h" />
+    <ClInclude Include="TickManager.h" />
     <ClInclude Include="TitleScene.h" />
   </ItemGroup>
   <ItemGroup>
