@@ -302,6 +302,8 @@ void GameScene::Draw()
     float puzzleStartX = PuzzleConstants::WindowWidth - totalPuzzleWidth - rightMargin;
     float puzzleStartY = PuzzleConstants::PuzzleStartY;
 
+    int testValue = 9;
+
     ComPtr<ID3D11ShaderResourceView> baseTex = (texWhite.Get() != nullptr) ? texWhite : texPlayer;
 
     ColorF woodColor(0.55f, 0.38f, 0.24f, 1.0f); // 木製風ブラウン

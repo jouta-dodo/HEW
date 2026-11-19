@@ -2,6 +2,9 @@
 #include "Input.h"
 #include <ctime>
 #include"Graphics.h"
+#include"Game.h"
+#include"Scene.h"
+#include"TitleScene.h"
 
 void BlockOperation::Init(ComPtr<ID3D11ShaderResourceView> texture)
 {
@@ -277,7 +280,7 @@ void BlockOperation::Draw()
 			drawX = startX + x * (upperBlockSize + space);
 			drawY = startY + y * (upperBlockSize + space);
 			ColorF blockColor = GetBlockColor(m_upperblocks[x][y].type);
-			Graphics::DrawImage(drawX, drawY, upperBlockSize, upperBlockSize, blocktexture, blockColor);
+			Graphics::DrawImage((float)drawX, (float)drawY, upperBlockSize, upperBlockSize, blocktexture, blockColor);
 		}
 	}
 
@@ -290,11 +293,9 @@ void BlockOperation::Draw()
 			drawX = startX + x * (lowerBlockSize + space);
 			drawY = startY + y * (lowerBlockSize + space);
 			ColorF blockColor = GetBlockColor(m_lowerblocks[x][y].type);
-			Graphics::DrawImage(drawX, drawY, lowerBlockSize, lowerBlockSize, blocktexture, blockColor);
+			Graphics::DrawImage((float)drawX, (float)drawY, lowerBlockSize, lowerBlockSize, blocktexture, blockColor);
 		}
 	}
-
-
 
 	// ÉQÅ[ÉÄèàóùé¿çs
 	//RendererDrawStart();
@@ -571,7 +572,7 @@ int BlockOperation::IsInvalidBlockMove(int dirx, int diry, int state)
 					break;
 				}
 			}
-			if (ngFg == true)
+			if (ngFg == 1)
 			{
 				break;
 			}
@@ -610,6 +611,7 @@ int BlockOperation::IsInvalidBlockMove(int dirx, int diry, int state)
 		break;
 	}
 
+	return ngFg;
 }
 
 
