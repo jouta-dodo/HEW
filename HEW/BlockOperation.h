@@ -1,10 +1,38 @@
 #pragma once
 #include "CSVLoad.h"
+#include "Graphics.h"
 #include "contents.h"
 #include <iostream>
 #include <vector>
 
 using upperblockdata = std::array<std::array<int, upperHeight>, upperWidth>;
+
+enum class BlockType
+{
+	none,
+	red,
+	blue,
+	yellow,
+	rightred,
+	rightblue,
+	rightyellow,
+	black,
+};
+//
+//enum class BlockState
+//{
+//	Enpty,
+//	Selected,
+//	Unselected,
+//	Moving,
+//	Fixing
+//};
+
+struct StringBlocks
+{
+	BlockType type = BlockType::none;
+	//BlockState state = BlockState::Enpty;
+};
 
 class BlockOperation
 {
@@ -52,6 +80,8 @@ private:
 	};
 
 	Color color = Color::none;
+
+	void SetColor();
 
 	enum class Phase
 	{
@@ -102,7 +132,6 @@ public:
 
 	// ゲーム更新処理
 	void Update();
-	//void SetColor();
 	// 描画処理
 	void Draw();
 
@@ -127,7 +156,25 @@ public:
 	//int a = data[x][y];	//←dataはx,yの順番でその配列を見れる
 	upperblockdata GetUpperBlockData();
 
+	StringBlocks m_upperblocks[upperWidth][upperHeight];
+	StringBlocks m_lowerblocks[lowerWidth][lowerHeight];
+
 	bool isMove = false;
 	bool isSet = false;
 };
 
+inline ColorF GetBlockColor(BlockType type)
+{
+	switch (type)
+	{
+	case BlockType::none:		 return ColorF(1.0f, 1.0f, 1.0f, 1.0f);
+	case BlockType::red:		 return ColorF(1.0f, 0.0f, 0.0f, 1.0f);
+	case BlockType::blue:		 return ColorF(0.0f, 0.0f, 1.0f, 1.0f);
+	case BlockType::yellow:		 return ColorF(1.0f, 1.0f, 0.0f, 1.0f);
+	case BlockType::rightred:	 return ColorF(1.0f, 0.0f, 0.0f, 0.2f);
+	case BlockType::rightblue:	 return ColorF(0.0f, 0.0f, 1.0f, 0.2f);
+	case BlockType::rightyellow: return ColorF(1.0f, 1.0f, 0.0f, 0.2f);
+	case BlockType::black:		 return ColorF(0.0f, 0.0f, 0.0f, 0.2f);
+	default:break;
+	}
+}

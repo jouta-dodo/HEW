@@ -46,10 +46,22 @@ void BlockOperation::Init()
 	//		m_lowerdata[x][y][lowerUnselected] = blockdata.GetBlockData(y, x);
 	//	}
 	//}
+
+	for (int x = 0;x < upperWidth;x++)
+	{
+		for (int y = 0;y < upperHeight;y++)
+		{
+			m_upperblocks[x][y].type = BlockType::none;
+			//m_upperblocks[x][y].state = BlockState::Enpty;
+		}
+	}
+
 	for (int x = 0;x < lowerWidth;x++)
 	{
 		for (int y = 0;y < lowerHeight;y++)
 		{
+			m_lowerblocks[x][y].type = BlockType::none;
+			//m_lowerblocks[x][y].state = BlockState::Unselected;
 			m_lowerdata[x][y][lowerUnselected] = blockdata.GetBlockData(y, x);
 		}
 	}
@@ -81,6 +93,7 @@ void BlockOperation::Update()
 	switch (currentPhase)
 	{
 	case Phase::LowerBlockSelect:
+		
 		//どの位置のブロックを選択するか
 		lowerSelectBlock();
 
@@ -94,6 +107,7 @@ void BlockOperation::Update()
 			for (int y = 0;y < lowerHeight;y++)
 			{
 				m_lowerdata[x][y][lowerSelected] = 0;
+				//m_lowerblocks[x][y].state = BlockState::Enpty;
 			}
 		}
 
@@ -104,6 +118,7 @@ void BlockOperation::Update()
 				//選ばれてるブロックを表示する配列に入れる
 				m_lowerdata[startX + x][startY + y][lowerSelected] = m_lowerdata[startX + x][startY + y][lowerUnselected];
 				blockList[y][x] = m_lowerdata[startX + x][startY + y][lowerSelected];
+				//m_lowerblocks[startX + x][startY + y].state = BlockState::Selected;
 			}
 		}
 		if (Input::IsKeyPressed(Key::Enter))
@@ -135,6 +150,7 @@ void BlockOperation::Update()
 					for (int y = 0;y < blocklistHeight;y++)
 					{
 						m_lowerdata[deleteX + x][deleteY + y][lowerUnselected] = 0;
+						//m_lowerblocks[x][y].state = BlockState::Enpty;
 					}
 				}
 			}
@@ -408,6 +424,7 @@ void BlockOperation::PutBlock()
 	{
 		for (int y = 0;y < 3;y++)
 		{
+			//m_upperblocks[x][y].state = BlockState::Moving;
 			m_upperdata[x][y][upperMoving] = blockList[y][x];
 		}
 	}
@@ -573,6 +590,7 @@ bool BlockOperation::SetBlock()
 			{
 				if (m_upperdata[x][y][upperMoving] != 0)
 				{
+					//m_upperblocks[x][y].state = BlockState::Fixing;
 					m_upperdata[x][y][upperFixing] = m_upperdata[x][y][upperMoving];
 					m_upperdata[x][y][upperRecording] = blockNum + 1;
 					m_upperdata[x][y][upperMoving] = 0;
@@ -616,6 +634,7 @@ void BlockOperation::ResetBlocks()
 			for (int i = 0;i < upperBlockState;i++)
 			{
 				m_upperdata[x][y][i] = {};
+				//m_upperblocks[x][y].state = BlockState::Enpty;
 			}
 		}
 	}
@@ -624,6 +643,7 @@ void BlockOperation::ResetBlocks()
 		for (int y = 0;y < lowerHeight;y++)
 		{
 			m_lowerdata[x][y][lowerUnselected] = blockdata.GetBlockData(y, x);
+			//m_lowerblocks[x][y].state = BlockState::Unselected;
 		}
 	}
 	for (int i = 0;i < MAXBLOCK;i++)
@@ -632,7 +652,7 @@ void BlockOperation::ResetBlocks()
 	}
 	blockNum = 0;
 }
-/*
+
 void BlockOperation::SetColor()
 {
 	for (int x = 0;x < upperWidth;x++)
@@ -643,16 +663,16 @@ void BlockOperation::SetColor()
 			switch (color)
 			{
 			case Color::none:		//空白
-				m_upperFixingblock[x][y].SetColor(1.0f, 1.0f, 1.0f, 0.2f);
+				m_upperblocks[x][y].type = BlockType::none;
 				break;
 			case Color::red:		//赤色
-				m_upperFixingblock[x][y].SetColor(1.0f, 0.0f, 0.0f, 1.0f);
+				m_upperblocks[x][y].type = BlockType::red;
 				break;
 			case Color::blue:		//青色
-				m_upperFixingblock[x][y].SetColor(0.0f, 0.0f, 1.0f, 1.0f);
+				m_upperblocks[x][y].type = BlockType::blue;
 				break;
 			case Color::yellow:		//黄色
-				m_upperFixingblock[x][y].SetColor(1.0f, 1.0f, 0.0f, 1.0f);
+				m_upperblocks[x][y].type = BlockType::yellow;
 				break;
 			}
 		}
@@ -665,19 +685,19 @@ void BlockOperation::SetColor()
 			switch (color)
 			{
 			case Color::none:		//空白
-				m_upperMovingblock[x][y].SetColor(0.0f, 0.0f, 0.0f, 0.0f);
+				m_upperblocks[x][y].type = BlockType::none;
 				break;
 			case Color::rightred:	//薄い赤色
-				m_upperMovingblock[x][y].SetColor(1.0f, 0.0f, 0.0f, 0.5f);
+				m_upperblocks[x][y].type = BlockType::rightred;
 				break;
 			case Color::rightblue:	//薄い青色
-				m_upperMovingblock[x][y].SetColor(0.0f, 0.0f, 1.0f, 0.5f);
+				m_upperblocks[x][y].type = BlockType::rightblue;
 				break;
 			case Color::rightyellow://薄い黄色
-				m_upperMovingblock[x][y].SetColor(1.0f, 1.0f, 0.0f, 0.5f);
+				m_upperblocks[x][y].type = BlockType::rightyellow;
 				break;
 			default:
-				m_upperMovingblock[x][y].SetColor(0.0f, 0.0f, 0.0f, 0.0f);
+				m_upperblocks[x][y].type = BlockType::none;
 				break;
 			}
 		}
@@ -691,13 +711,13 @@ void BlockOperation::SetColor()
 			switch (color)
 			{
 			case Color::none:		//空白
-				m_upperSelectingblock[x][y].SetColor(1.0f, 1.0f, 1.0f, 0.0f);
+				m_upperblocks[x][y].type = BlockType::none;
 				break;
 			case Color::black:		//黒色
-				m_upperSelectingblock[x][y].SetColor(0.1f, 0.1f, 0.1f, 0.1f);
+				m_upperblocks[x][y].type = BlockType::black;
 				break;
 			default:
-				m_upperSelectingblock[x][y].SetColor(1.0f, 1.0f, 1.0f, 0.0f);
+				m_upperblocks[x][y].type = BlockType::none;
 				break;
 			}
 		}
@@ -711,16 +731,16 @@ void BlockOperation::SetColor()
 			switch (color)
 			{
 			case Color::none:		//空白
-				m_lowerSelectingblock[x][y].SetColor(1.0f, 1.0f, 1.0f, 0.0f);
+				m_lowerblocks[x][y].type = BlockType::none;
 				break;
 			case Color::red:		//赤色
-				m_lowerSelectingblock[x][y].SetColor(1.0f, 0.0f, 0.0f, 1.0f);
+				m_lowerblocks[x][y].type = BlockType::red;
 				break;
 			case Color::blue:		//青色
-				m_lowerSelectingblock[x][y].SetColor(0.0f, 0.0f, 1.0f, 1.0f);
+				m_lowerblocks[x][y].type = BlockType::blue;
 				break;
 			case Color::yellow:		//黄色
-				m_lowerSelectingblock[x][y].SetColor(1.0f, 1.0f, 0.0f, 1.0f);
+				m_lowerblocks[x][y].type = BlockType::yellow;
 				break;
 			default:
 				break;
@@ -735,25 +755,25 @@ void BlockOperation::SetColor()
 			switch (color)
 			{
 			case Color::none:		//空白
-				m_lowerNonselectingblocks[x][y].SetColor(1.0f, 1.0f, 1.0f, 1.0f);
+				m_lowerblocks[x][y].type = BlockType::none;
 				break;
 			case Color::rightred:	//薄い赤色
-				m_lowerNonselectingblocks[x][y].SetColor(1.0f, 0.0f, 0.0f, 0.5f);
+				m_lowerblocks[x][y].type = BlockType::rightred;
 				break;
 			case Color::rightblue:	//薄い青色
-				m_lowerNonselectingblocks[x][y].SetColor(0.0f, 0.0f, 1.0f, 0.5f);
+				m_lowerblocks[x][y].type = BlockType::rightblue;
 				break;
 			case Color::rightyellow://薄い黄色
-				m_lowerNonselectingblocks[x][y].SetColor(1.0f, 1.0f, 0.0f, 0.5f);
+				m_lowerblocks[x][y].type = BlockType::rightyellow;
 				break;
 			default:
-				m_lowerNonselectingblocks[x][y].SetColor(1.0f, 1.0f, 1.0f, 0.2f);
+				m_lowerblocks[x][y].type = BlockType::none;
 				break;
 			}
 		}
 	}
 }
-*/
+
 
 
 int BlockOperation::GetCurrentPhase()
