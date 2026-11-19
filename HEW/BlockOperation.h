@@ -1,8 +1,10 @@
 #pragma once
 #include "CSVLoad.h"
 #include "contents.h"
+#include "Graphics.h"
 #include <iostream>
 #include <vector>
+#include <array>
 
 using upperblockdata = std::array<std::array<int, upperHeight>, upperWidth>;
 
@@ -77,6 +79,7 @@ private:
 		rightblue,
 		rightyellow,
 		black,
+		white
 	};
 
 	Color color = Color::none;
