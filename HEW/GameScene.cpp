@@ -92,7 +92,7 @@ void GameScene::Update()
     */
     if (currentPhase == GamePhase::Setup)
     {
-        // 配置フェーズ中もプレイヤーに重力だけを適用する
+        // 配置フェーズ中もプレイヤーに重力だけを適用するようにする
         player.UpdateGravity(PuzzleConstants::WindowWidth, 720.0f);
         bool puzzleUpdated = false;
 
@@ -126,7 +126,7 @@ void GameScene::Update()
         }
         isSpacePressedLastFrame = isSpaceCurrent;
 
-        // リセットキー（Rキー）
+        //パズルのリセットボタンはRキーでリセットするように
         if ((GetAsyncKeyState('R') & 0x8000)) {
             simulator.ResetBlocks();
             puzzleUpdated = true;

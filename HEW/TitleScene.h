@@ -1,11 +1,12 @@
 #pragma once
 #include "Scene.h"
-#include "Graphics.h" // ‰æ‘œ“Ç‚İ‚İE•`‰æ‚É•K—v
+#include "Graphics.h"
 
 class TitleScene : public IScene
 {
 private:
-    ComPtr<ID3D11ShaderResourceView> texBackground; // ”wŒi‰æ‘œ—p
+    ComPtr<ID3D11ShaderResourceView> texBackground;
+    bool spaceWasPressed = false;
 
 public:
     void Init() override;

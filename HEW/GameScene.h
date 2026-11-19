@@ -43,7 +43,6 @@ private:
     void DrawDigit(int digit, float x, float y, float size, const ColorF& color);
     void DrawStarCount();
     void DrawResultOverlay();
-    //void OnStageCleared();
 
 public:
     void Init() override;
