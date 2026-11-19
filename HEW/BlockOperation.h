@@ -1,26 +1,22 @@
 #pragma once
 #include "CSVLoad.h"
 #include "contents.h"
-#include "Graphics.h"
 #include <iostream>
 #include <vector>
-#include <array>
 
 using upperblockdata = std::array<std::array<int, upperHeight>, upperWidth>;
 
+//ブロックの色
 enum class BlockType
 {
 	none,
 	red,
 	blue,
 	yellow,
-	rightred,
-	rightblue,
-	rightyellow,
 	black,
 	white
 };
-//
+
 //enum class BlockState
 //{
 //	Enpty,
@@ -78,8 +74,7 @@ private:
 		rightred,
 		rightblue,
 		rightyellow,
-		black,
-		white
+		black
 	};
 
 	Color color = Color::none;
@@ -172,18 +167,17 @@ public:
 	bool isSet = false;
 };
 
+//色の設定
 inline ColorF GetBlockColor(BlockType type)
 {
 	switch (type)
 	{
-	case BlockType::none:		 return ColorF(1.0f, 1.0f, 1.0f, 1.0f);
-	case BlockType::red:		 return ColorF(1.0f, 0.0f, 0.0f, 1.0f);
-	case BlockType::blue:		 return ColorF(0.0f, 0.0f, 1.0f, 1.0f);
-	case BlockType::yellow:		 return ColorF(1.0f, 1.0f, 0.0f, 1.0f);
-	case BlockType::rightred:	 return ColorF(1.0f, 0.0f, 0.0f, 0.2f);
-	case BlockType::rightblue:	 return ColorF(0.0f, 0.0f, 1.0f, 0.2f);
-	case BlockType::rightyellow: return ColorF(1.0f, 1.0f, 0.0f, 0.2f);
-	case BlockType::black:		 return ColorF(0.0f, 0.0f, 0.0f, 0.2f);
-	default:break;
+	case BlockType::none:	return Color::White;
+	case BlockType::red:	return Color::Red;
+	case BlockType::blue:	return Color::Blue;
+	case BlockType::yellow:	return Color::Yellow;
+	case BlockType::black:	return Color::Black;
+	case BlockType::white:	return Color::White;
+	default:				return Color::White;
 	}
 }
