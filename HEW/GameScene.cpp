@@ -78,14 +78,18 @@ void GameScene::Init()
     texPlayer = Graphics::LoadTexture(L"assets\\ui.png");
     texWhite = Graphics::LoadTexture(L"assets\\siroiro.png");
     player.Init(texPlayer);
-    bo.Init();
-    blockdata.LoadBlockCSV("assets/stage1.csv");
+    bo.Init(texWhite);
 }
 
 void GameScene::Update()
 {
     //  パズル配置フェーズ
     // ==========================================
+
+    bo.Update();
+    /*
+    
+    */
     if (currentPhase == GamePhase::Setup)
     {
         // 配置フェーズ中もプレイヤーに重力だけを適用する
@@ -277,7 +281,7 @@ void GameScene::Draw()
 
     // プレイヤー画像の描画
     player.Draw();
-
+    bo.Draw();
     // スター1の描画
     if (!stageStarCollected)
     {
