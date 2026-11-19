@@ -2,11 +2,13 @@
 #include "Input.h"
 #include <ctime>
 
-void BlockOperation::Init()
+void BlockOperation::Init(ComPtr<ID3D11ShaderResourceView> texture)
 {
 	srand((unsigned)time(NULL));
 
-	blockdata.LoadBlockCSV("asset/stage1.csv");
+	blocktexture = texture;
+
+	blockdata.LoadBlockCSV("assets/stage1.csv");
 
 	//m_player.Init("asset/char01.png", 3, 4);
 	//m_player.SetPos(0.0f, 0.0f, 0.0f);
@@ -83,7 +85,7 @@ void BlockOperation::Update()
 	//m_input.Update();
 	// 
 	//色の設定
-	//SetColor();
+	SetColor();
 
 	if ((GetAsyncKeyState('R') & 0x8000)) 
 	{
@@ -261,6 +263,29 @@ void BlockOperation::Update()
 
 void BlockOperation::Draw()
 {
+	int startX = 800;
+	int startY = 250;
+	int space = 5;
+
+	for (int x = 0;x < upperWidth;x++)
+	{
+		for (int y = 0;y < upperHeight;y++)
+		{
+			ColorF blockColor = GetBlockColor(m_upperblocks[x][y].type);
+			Graphics::DrawImage(startX + x * (upperBlockSize + space), startY + y * (upperBlockSize + space), upperBlockSize, upperBlockSize, blocktexture, blockColor);
+		}
+	}
+
+	startY += 200;
+
+	for (int x = 0;x < lowerWidth;x++)
+	{
+		for (int y = 0;y < lowerHeight;y++)
+		{
+			ColorF blockColor = GetBlockColor(m_lowerblocks[x][y].type);
+			Graphics::DrawImage(startX + x * (lowerBlockSize + space), startY + y * (lowerBlockSize + space), lowerBlockSize, lowerBlockSize, blocktexture, blockColor);
+		}
+	}
 	// ゲーム処理実行
 	//RendererDrawStart();
 
@@ -663,7 +688,7 @@ void BlockOperation::SetColor()
 			switch (color)
 			{
 			case Color::none:		//空白
-				m_upperblocks[x][y].type = BlockType::none;
+				m_upperblocks[x][y].type = BlockType::white;
 				break;
 			case Color::red:		//赤色
 				m_upperblocks[x][y].type = BlockType::red;
@@ -722,7 +747,31 @@ void BlockOperation::SetColor()
 			}
 		}
 	}
-
+	for (int x = 0;x < lowerWidth;x++)
+	{
+		for (int y = 0;y < lowerHeight;y++)
+		{
+			color = static_cast<Color>(m_lowerdata[x][y][lowerUnselected] + 3);
+			switch (color)
+			{
+			case Color::none:		//空白
+				m_lowerblocks[x][y].type = BlockType::none;
+				break;
+			case Color::rightred:	//薄い赤色
+				m_lowerblocks[x][y].type = BlockType::rightred;
+				break;
+			case Color::rightblue:	//薄い青色
+				m_lowerblocks[x][y].type = BlockType::rightblue;
+				break;
+			case Color::rightyellow://薄い黄色
+				m_lowerblocks[x][y].type = BlockType::rightyellow;
+				break;
+			default:
+				m_lowerblocks[x][y].type = BlockType::white;
+				break;
+			}
+		}
+	}
 	for (int x = 0;x < lowerWidth;x++)
 	{
 		for (int y = 0;y < lowerHeight;y++)
@@ -747,31 +796,7 @@ void BlockOperation::SetColor()
 			}
 		}
 	}
-	for (int x = 0;x < lowerWidth;x++)
-	{
-		for (int y = 0;y < lowerHeight;y++)
-		{
-			color = static_cast<Color>(m_lowerdata[x][y][lowerUnselected] + 3);
-			switch (color)
-			{
-			case Color::none:		//空白
-				m_lowerblocks[x][y].type = BlockType::none;
-				break;
-			case Color::rightred:	//薄い赤色
-				m_lowerblocks[x][y].type = BlockType::rightred;
-				break;
-			case Color::rightblue:	//薄い青色
-				m_lowerblocks[x][y].type = BlockType::rightblue;
-				break;
-			case Color::rightyellow://薄い黄色
-				m_lowerblocks[x][y].type = BlockType::rightyellow;
-				break;
-			default:
-				m_lowerblocks[x][y].type = BlockType::none;
-				break;
-			}
-		}
-	}
+
 }
 
 
