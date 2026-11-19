@@ -32,12 +32,17 @@ private:
     bool isSpacePressedLastFrame = false;
 
     bool stageStarCollected = false;
-    bool puzzleStarCollected = false;
+    bool clearStarCollected = false;
+    bool tickStarCollected = false;
+
+    bool resultShown = false;
+
+    int tickLoopCount = 1;
 
     bool IsOverlapping(float x1, float y1, float w1, float h1, float x2, float y2, float w2, float h2);
     void DrawDigit(int digit, float x, float y, float size, const ColorF& color);
     void DrawStarCount();
-    void OnStageCleared();
+    void DrawResultOverlay();
 
 public:
     void Init() override;

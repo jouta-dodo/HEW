@@ -14,15 +14,21 @@ namespace PuzzleConstants
 	constexpr float WindowWidth = 1280.0f;
 	constexpr float PuzzleStartY = 40.0f;
 
-	//ステージスターの位置とサイズ
+	// ステージスターの位置とサイズ
 	constexpr float StageStarX = 300.0f;
 	constexpr float StageStarY = 300.0f;
 	constexpr float StageStarSize = 40.0f;
 
-	//スター２の配置マス（壁の右横）
+	// パズルスターの配置マス
 	constexpr int PuzzleStarTargetX = 2;
 	constexpr int PuzzleStarTargetY = 1;
 	constexpr float PuzzleStarSize = 36.0f;
+
+	// ゴールオブジェクト
+	constexpr float GoalX = 760.0f;
+	constexpr float GoalY = 350.0f;
+	constexpr float GoalWidth = 70.0f;
+	constexpr float GoalHeight = 100.0f;
 }
 
 // FrameworkColorをDirectXのColorFに変換する共通ヘルパー関数

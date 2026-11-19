@@ -150,53 +150,14 @@ namespace Game
 	{
 		Input::BindAction(Cmd::MoveLeft, { Key::Left, Key::A }, { Button::Left });
 		Input::BindAction(Cmd::MoveRight, { Key::Right, Key::D }, { Button::Right });
+
 		cout << "初期化完了\n";
 
-		//===========================================
-		//ここにシーンの設定のやつ書く
-		//SceneManager::ChangeScene(new TitleScene);
-		//===========================================
-
-		//==============
-		//画像貼り付け
-		//==============
 		texPlayer = Graphics::LoadTexture(L"assets\\ui.png");
 		texWhite = Graphics::LoadTexture(L"assets\\siroiro.png");
 
-		if (texPlayer.Get() == nullptr)
-		{
-			MessageBox(nullptr, L"画像の読み込み失敗", L"警告", MB_OK);
-		}
-		if (texWhite.Get() == nullptr)
-		{
-			MessageBox(nullptr, L"siroiro.png の読み込み失敗", L"警告", MB_OK);
-		}
-		else
-		{
-			MessageBox(nullptr, L"画像読み込み成功", L"成功", MB_OK);
-		}
-
-		//==============
-		//音の読み込み
-		// 
-		// 使い方
-		// 例
-		// Audio::Load(L"assets\\stage1.mp3,L"BgmStage1");
-		// Audio::Load(L"assets\\jump.wav",L"SeJump")
-		// こうやってファイルパス入力してその音源の名前決めます
-		// 
-		// 鳴らすときは
-		// BGMなら
-		// Audio::PlayBGM(L"BgmStage1");
-		// 
-		// SEなら
-		// Audio::PlaySE(L"SeJump")
-		// こうやったら使えます
-		// 
-		// Inutで呼ぶのはＢＧＭ
-		// 効果音は必ずUpdateで呼ぶこと
-		//==============
-
+		// 起動時のシーンをタイトルにする
+		SceneManager::ChangeScene(new TitleScene());
 	}
 
 	void Update()
@@ -306,222 +267,13 @@ namespace Game
 				std::cout << "\n★ スター1を獲得しました！\n";
 			}
 		}
+
+		SceneManager::Update();
 	}
 
 	void Draw()
 	{
-		//========================================================================================
-		// 待望の点線描画機能追加
-		// 使い方
-		// 普通に箱描画
-		// そして下の形式で入力する
-		// Graphics::DrawDashedBorder(playerX, playerY, 100.0f, 100.0f, Color::Red, 10.0f, 3.0f);
-		// そしたら描画できます
-		// =======================================================================================
-		
-		// 左上にスターの獲得数を表示
-		DrawStarCount();
-
-		// メンバーが作ったプレイヤー画像の描画
-		Graphics::DrawImage(playerX, playerY, 100.0f, 100.0f, texPlayer, Color::White);
-
-		// スター1の描画
-		if (!stageStarCollected)
-		{
-			Graphics::DrawImage(
-				PuzzleConstants::StageStarX,
-				PuzzleConstants::StageStarY,
-				PuzzleConstants::StageStarSize,
-				PuzzleConstants::StageStarSize,
-				texWhite,
-				Color::Yellow);
-		}
-
-		// =====================================================================
-		// ★ゲーム画面の右端に綺麗に整えられたパズル盤面を描画
-		// =====================================================================
-		float cellSize = PuzzleConstants::CellSize;
-		float cellSpacing = PuzzleConstants::CellSpacing;
-		float rightMargin = PuzzleConstants::RightMargin;
-
-		float totalPuzzleWidth = GRID_WIDTH * cellSize + (GRID_WIDTH - 1) * cellSpacing;
-		float puzzleStartX = PuzzleConstants::WindowWidth - totalPuzzleWidth - rightMargin;
-		float puzzleStartY = PuzzleConstants::PuzzleStartY;
-
-		ComPtr<ID3D11ShaderResourceView> baseTex = (texWhite.Get() != nullptr) ? texWhite : texPlayer;
-
-		ColorF woodColor(0.55f, 0.38f, 0.24f, 1.0f); // 木製風ブラウン
-		ColorF wallColor(0.35f, 0.35f, 0.35f, 1.0f); // 壁用の濃い灰色
-
-		// 盤面データを取得
-		BlockCell currentGrid[GRID_WIDTH][GRID_HEIGHT];
-		simulator.GetCurrentGridData(currentGrid);
-
-		int focusedIdx = simulator.GetFocusedBlockIndex();
-		int heldIdx = simulator.GetHeldIndex();
-		const auto& blocks = simulator.GetBlocks();
-
-		// 1. 各セルのベース（背景・壁・固定ギミック・ブロック）を描画
-		for (int x = 0; x < GRID_WIDTH; x++)
-		{
-			for (int y = 0; y < GRID_HEIGHT; y++)
-			{
-				float drawX = puzzleStartX + x * (cellSize + cellSpacing);
-				float drawY = puzzleStartY + y * (cellSize + cellSpacing);
-
-				// ① 壁のチェック
-				if (simulator.IsWall(x, y)) {
-					Graphics::DrawImage(drawX, drawY, cellSize, cellSize, baseTex, wallColor);
-				}
-				// ② ブロックが存在する場合
-				else if (currentGrid[x][y].hasBlock) {
-					ColorF cellColor = GetColorFromFramework(currentGrid[x][y].color);
-					Graphics::DrawImage(drawX, drawY, cellSize, cellSize, baseTex, cellColor);
-				}
-				// ③ 固定ギミックのチェック（ブロックが乗っていない場合）
-				else {
-					FrameworkColor gColor = simulator.GetFixedGimmick(x, y);
-					if (gColor != FrameworkColor::None) {
-						ColorF gimmickBorderColor = GetColorFromFramework(gColor);
-						float fw = PuzzleConstants::FrameWidth;
-						Graphics::DrawImage(drawX - fw, drawY - fw, cellSize + fw * 2.0f, cellSize + fw * 2.0f, baseTex, gimmickBorderColor);
-						Graphics::DrawImage(drawX, drawY, cellSize, cellSize, baseTex, Color::White);
-					}
-					else {
-						Graphics::DrawImage(drawX, drawY, cellSize, cellSize, baseTex, woodColor);
-					}
-				}
-			}
-		}
-
-		// スター2の描画（壁の右横）
-		if (!puzzleStarCollected)
-		{
-			float starX = puzzleStartX + PuzzleConstants::PuzzleStarTargetX * (cellSize + cellSpacing);
-			float starY = puzzleStartY + PuzzleConstants::PuzzleStarTargetY * (cellSize + cellSpacing);
-			float starOffset = (cellSize - PuzzleConstants::PuzzleStarSize) / 2.0f;
-			Graphics::DrawImage(
-				starX + starOffset,
-				starY + starOffset,
-				PuzzleConstants::PuzzleStarSize,
-				PuzzleConstants::PuzzleStarSize,
-				baseTex,
-				Color::Yellow);
-		}
-
-		// 2. 選択中のブロックに対する「白枠（またはオレンジ枠）」のハイライト表示
-		if (currentPhase == GamePhase::Setup)
-		{
-			int targetIdx = (heldIdx != -1) ? heldIdx : focusedIdx;
-			if (targetIdx >= 0 && targetIdx < (int)blocks.size())
-			{
-				const auto& block = blocks[targetIdx];
-				for (int ly = 0; ly < 3; ly++)
-				{
-					for (int lx = 0; lx < 3; lx++)
-					{
-						if (block.shape[ly][lx] == 1)
-						{
-							int gx = block.x + lx;
-							int gy = block.y + ly;
-							if (gx >= 0 && gx < GRID_WIDTH && gy >= 0 && gy < GRID_HEIGHT)
-							{
-								float drawX = puzzleStartX + gx * (cellSize + cellSpacing);
-								float drawY = puzzleStartY + gy * (cellSize + cellSpacing);
-
-								float frameWidth = PuzzleConstants::FrameWidth;
-								ColorF frameColor = (heldIdx != -1) ? Color::Orange : Color::White;
-
-								Graphics::DrawImage(drawX - frameWidth, drawY - frameWidth, cellSize + frameWidth * 2.0f, cellSize + frameWidth * 2.0f, baseTex, frameColor);
-
-								ColorF cellColor = GetColorFromFramework(currentGrid[gx][gy].color);
-								Graphics::DrawImage(drawX, drawY, cellSize, cellSize, baseTex, cellColor);
-							}
-						}
-					}
-				}
-			}
-		}
-
-		// プレイ中のハイライト（現在チェック中の列）
-		if (currentPhase == GamePhase::Playing)
-		{
-			for (int y = 0; y < GRID_HEIGHT; y++)
-			{
-				int gx = currentTick - 1;
-				if (gx >= 0 && gx < GRID_WIDTH)
-				{
-					float drawX = puzzleStartX + gx * (cellSize + cellSpacing);
-					float drawY = puzzleStartY + y * (cellSize + cellSpacing);
-					float tickWidth = PuzzleConstants::FrameWidth;
-					Graphics::DrawImage(drawX - tickWidth, drawY - tickWidth, cellSize + tickWidth * 2.0f, cellSize + tickWidth * 2.0f, baseTex, Color::Cyan);
-
-					if (currentGrid[gx][y].hasBlock) {
-						ColorF cellColor = GetColorFromFramework(currentGrid[gx][y].color);
-						Graphics::DrawImage(drawX, drawY, cellSize, cellSize, baseTex, cellColor);
-					}
-				}
-			}
-		}
-
-		// 3. パズル盤面のすぐ下に「その列にある複数のブロックの色」を積み上げて描画
-		float resultBarY = puzzleStartY + GRID_HEIGHT * (cellSize + cellSpacing) + 12.0f;
-		float subBoxSize = cellSize / 3.0f - 2.0f;
-
-		for (int x = 0; x < GRID_WIDTH; x++)
-		{
-			float drawX = puzzleStartX + x * (cellSize + cellSpacing);
-
-			if (currentPhase == GamePhase::Playing && (x + 1 == currentTick)) {
-				Graphics::DrawImage(drawX - 3.0f, resultBarY - 3.0f, cellSize + 6.0f, (subBoxSize + 2.0f) * 3.0f + 6.0f, baseTex, Color::Cyan);
-			}
-
-			int blockCount = 0;
-			for (int y = 0; y < GRID_HEIGHT; y++) {
-				if (currentGrid[x][y].hasBlock) {
-					ColorF blockColor = GetColorFromFramework(currentGrid[x][y].color);
-					float subY = resultBarY + blockCount * (subBoxSize + 2.0f);
-					Graphics::DrawImage(drawX, subY, cellSize, subBoxSize, baseTex, blockColor);
-					blockCount++;
-				}
-			}
-			if (blockCount == 0) {
-				Graphics::DrawImage(drawX, resultBarY, cellSize, 18.0f, baseTex, Color::Gray);
-			}
-		}
-
-
-		// ==========================================
-		// コンソール画面側の描画（確認用ログ）
-		// ==========================================
-		if (needsRedraw)
-		{
-			system("cls");
-
-			if (currentPhase == GamePhase::Setup)
-			{
-				cout << "=== 【フェーズ: パズル配置】 ===\n";
-				simulator.DrawGrid();
-
-				if (heldIdx != -1) {
-					cout << "\n状態: 【ブロック移動中】 (スペースキーで配置)\n";
-				}
-				else {
-					cout << "\n状態: 【ブロック選択中】 (W/A/S/Dで選択, スペースで掴む)\n";
-				}
-				cout << "操作: [W/A/S/D]移動  [Space]決定/解除  [R]リセット  [Enter]プレイ開始\n";
-			}
-			else if (currentPhase == GamePhase::Playing)
-			{
-				cout << "ティック 1-5 周回中（ゲーム画面右端で操作・確認できます）\n";
-				cout << "([Q] キーを押すと配置フェーズに戻ります)\n\n";
-
-				cout << "現在のティック: " << currentTick << " 列目をチェック中\n";
-				judgeSystem.EvaluateColumn(currentTick);
-			}
-
-			needsRedraw = false;
-		}
+		SceneManager::Draw();
 	}
 
 }

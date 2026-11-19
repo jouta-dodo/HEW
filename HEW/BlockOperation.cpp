@@ -270,13 +270,17 @@ void BlockOperation::Draw()
 	int startX = 800;
 	int startY = 250;
 	int space = 5;
+	int drawX = 0;
+	int drawY = 0;
 
 	for (int x = 0;x < upperWidth;x++)
 	{
 		for (int y = 0;y < upperHeight;y++)
 		{
+			drawX = startX + x * (upperBlockSize + space);
+			drawY = startY + y * (upperBlockSize + space);
 			ColorF blockColor = GetBlockColor(m_upperblocks[x][y].type);
-			Graphics::DrawImage(startX + x * (upperBlockSize + space), startY + y * (upperBlockSize + space), upperBlockSize, upperBlockSize, blocktexture, blockColor);
+			Graphics::DrawImage(drawX, drawY, upperBlockSize, upperBlockSize, blocktexture, blockColor);
 		}
 	}
 
@@ -286,8 +290,10 @@ void BlockOperation::Draw()
 	{
 		for (int y = 0;y < lowerHeight;y++)
 		{
+			drawX = startX + x * (lowerBlockSize + space);
+			drawY = startY + y * (lowerBlockSize + space);
 			ColorF blockColor = GetBlockColor(m_lowerblocks[x][y].type);
-			Graphics::DrawImage(startX + x * (lowerBlockSize + space), startY + y * (lowerBlockSize + space), lowerBlockSize, lowerBlockSize, blocktexture, blockColor);
+			Graphics::DrawImage(drawX, drawY, lowerBlockSize, lowerBlockSize, blocktexture, blockColor);
 		}
 	}
 
@@ -718,13 +724,13 @@ void BlockOperation::SetColor()
 				m_upperblocks[x][y].type = BlockType::none;
 				break;
 			case Color::rightred:	//薄い赤色
-				m_upperblocks[x][y].type = BlockType::rightred;
+				m_upperblocks[x][y].type = BlockType::red;
 				break;
 			case Color::rightblue:	//薄い青色
-				m_upperblocks[x][y].type = BlockType::rightblue;
+				m_upperblocks[x][y].type = BlockType::blue;
 				break;
 			case Color::rightyellow://薄い黄色
-				m_upperblocks[x][y].type = BlockType::rightyellow;
+				m_upperblocks[x][y].type = BlockType::yellow;
 				break;
 			default:
 				m_upperblocks[x][y].type = BlockType::none;
@@ -763,13 +769,13 @@ void BlockOperation::SetColor()
 				m_lowerblocks[x][y].type = BlockType::none;
 				break;
 			case Color::rightred:	//薄い赤色
-				m_lowerblocks[x][y].type = BlockType::rightred;
+				m_lowerblocks[x][y].type = BlockType::red;
 				break;
 			case Color::rightblue:	//薄い青色
-				m_lowerblocks[x][y].type = BlockType::rightblue;
+				m_lowerblocks[x][y].type = BlockType::blue;
 				break;
 			case Color::rightyellow://薄い黄色
-				m_lowerblocks[x][y].type = BlockType::rightyellow;
+				m_lowerblocks[x][y].type = BlockType::yellow;
 				break;
 			default:
 				m_lowerblocks[x][y].type = BlockType::white;
