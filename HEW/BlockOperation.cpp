@@ -280,7 +280,7 @@ void BlockOperation::Draw()
 			drawX = startX + x * (upperBlockSize + space);
 			drawY = startY + y * (upperBlockSize + space);
 			ColorF blockColor = GetBlockColor(m_upperblocks[x][y].type);
-			Graphics::DrawImage(drawX, drawY, upperBlockSize, upperBlockSize, blocktexture, blockColor);
+			Graphics::DrawImage((float)drawX, (float)drawY, upperBlockSize, upperBlockSize, blocktexture, blockColor);
 		}
 	}
 
@@ -293,7 +293,7 @@ void BlockOperation::Draw()
 			drawX = startX + x * (lowerBlockSize + space);
 			drawY = startY + y * (lowerBlockSize + space);
 			ColorF blockColor = GetBlockColor(m_lowerblocks[x][y].type);
-			Graphics::DrawImage(drawX, drawY, lowerBlockSize, lowerBlockSize, blocktexture, blockColor);
+			Graphics::DrawImage((float)drawX, (float)drawY, lowerBlockSize, lowerBlockSize, blocktexture, blockColor);
 		}
 	}
 
@@ -572,7 +572,7 @@ int BlockOperation::IsInvalidBlockMove(int dirx, int diry, int state)
 					break;
 				}
 			}
-			if (ngFg == true)
+			if (ngFg == 1)
 			{
 				break;
 			}
@@ -611,6 +611,7 @@ int BlockOperation::IsInvalidBlockMove(int dirx, int diry, int state)
 		break;
 	}
 
+	return ngFg;
 }
 
 
