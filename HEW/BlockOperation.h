@@ -17,7 +17,7 @@ enum class BlockType
 	rightblue,
 	rightyellow,
 	black,
-	white,
+	white
 };
 //
 //enum class BlockState
