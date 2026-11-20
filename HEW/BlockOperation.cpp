@@ -269,7 +269,6 @@ void BlockOperation::Draw()
 {
 	int startX = 800;
 	int startY = 250;
-	int space = 5;
 	int drawX = 0;
 	int drawY = 0;
 
@@ -277,8 +276,8 @@ void BlockOperation::Draw()
 	{
 		for (int y = 0;y < upperHeight;y++)
 		{
-			drawX = startX + x * (upperBlockSize + space);
-			drawY = startY + y * (upperBlockSize + space);
+			drawX = startX + x * (upperBlockSize);
+			drawY = startY + y * (upperBlockSize);
 			ColorF blockColor = GetBlockColor(m_upperblocks[x][y].type);
 			Graphics::DrawImage((float)drawX, (float)drawY, upperBlockSize, upperBlockSize, blocktexture, blockColor);
 		}
@@ -290,8 +289,8 @@ void BlockOperation::Draw()
 	{
 		for (int y = 0;y < lowerHeight;y++)
 		{
-			drawX = startX + x * (lowerBlockSize + space);
-			drawY = startY + y * (lowerBlockSize + space);
+			drawX = startX + x * (lowerBlockSize);
+			drawY = startY + y * (lowerBlockSize);
 			ColorF blockColor = GetBlockColor(m_lowerblocks[x][y].type);
 			Graphics::DrawImage((float)drawX, (float)drawY, lowerBlockSize, lowerBlockSize, blocktexture, blockColor);
 		}
