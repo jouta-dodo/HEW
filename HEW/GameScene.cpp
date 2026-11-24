@@ -183,65 +183,7 @@ void GameScene::Update()
 
         bool puzzleUpdated = false;
 
-        if (Input::IsKeyPressed(Key::W) ||
-            Input::IsKeyPressed(Key::Up))
-        {
-            if (simulator.GetHeldIndex() != -1)
-            {
-                simulator.MoveHeldBlock(0, -1);
-            }
-            else
-            {
-                simulator.MoveFocus(0, -1);
-            }
-
-            puzzleUpdated = true;
-        }
-
-        if (Input::IsKeyPressed(Key::S) ||
-            Input::IsKeyPressed(Key::Down))
-        {
-            if (simulator.GetHeldIndex() != -1)
-            {
-                simulator.MoveHeldBlock(0, 1);
-            }
-            else
-            {
-                simulator.MoveFocus(0, 1);
-            }
-
-            puzzleUpdated = true;
-        }
-
-        if (Input::IsKeyPressed(Key::A) ||
-            Input::IsKeyPressed(Key::Left))
-        {
-            if (simulator.GetHeldIndex() != -1)
-            {
-                simulator.MoveHeldBlock(-1, 0);
-            }
-            else
-            {
-                simulator.MoveFocus(-1, 0);
-            }
-
-            puzzleUpdated = true;
-        }
-
-        if (Input::IsKeyPressed(Key::D) ||
-            Input::IsKeyPressed(Key::Right))
-        {
-            if (simulator.GetHeldIndex() != -1)
-            {
-                simulator.MoveHeldBlock(1, 0);
-            }
-            else
-            {
-                simulator.MoveFocus(1, 0);
-            }
-
-            puzzleUpdated = true;
-        }
+        puzzleUpdated = simulator.UpdateInput();
 
         bool isSpaceCurrent = Input::IsKeyHeld(Key::Space);
 
@@ -251,12 +193,32 @@ void GameScene::Update()
             puzzleUpdated = true;
         }
 
+        if (Input::IsKeyPressed(Key::C))
+        {
+            // Cキー：現在移動中のブロックだけを右下へ戻す。
+            puzzleUpdated =
+                simulator.ReturnHeldBlockToSource() || puzzleUpdated;
+        }
+
+        for (int sourceIndex = 0; sourceIndex < 6; sourceIndex++)
+        {
+            bo.SetSourceBlockVisible(
+                sourceIndex,
+                simulator.IsSourceBlockAvailable(sourceIndex));
+        }
+
         isSpacePressedLastFrame = isSpaceCurrent;
 
         // パズルのリセット
         if ((GetAsyncKeyState('R') & 0x8000))
         {
             simulator.ResetBlocks();
+
+            for (int sourceIndex = 0; sourceIndex < 6; sourceIndex++)
+            {
+                bo.SetSourceBlockVisible(sourceIndex, true);
+            }
+
             puzzleUpdated = true;
         }
 
@@ -396,6 +358,50 @@ void GameScene::Draw()
     player.Draw();
     bo.Draw();
 
+    // CSVブロックの選択中枠
+    if (simulator.IsSourceFocused())
+    {
+        const int sourceFocusIndex = simulator.GetSourceFocusIndex();
+        const float sourceStartX = 800.0f;
+        const float sourceStartY = 450.0f;
+        const float sourceCellSize = 22.0f;
+        const float sourceCellSpacing = 5.0f;
+        const float sourceBlockSize =
+            sourceCellSize * 3.0f + sourceCellSpacing * 2.0f;
+        const float sourceX =
+            sourceStartX + (sourceFocusIndex % 3) * 4.0f *
+            (sourceCellSize + sourceCellSpacing);
+        const float sourceY =
+            sourceStartY + (sourceFocusIndex / 3) * 4.0f *
+            (sourceCellSize + sourceCellSpacing);
+        const float sourceFrameWidth = 3.0f;
+
+        Graphics::DrawRect(
+            sourceX - sourceFrameWidth,
+            sourceY - sourceFrameWidth,
+            sourceBlockSize + sourceFrameWidth * 2.0f,
+            sourceFrameWidth,
+            Color::White);
+        Graphics::DrawRect(
+            sourceX - sourceFrameWidth,
+            sourceY + sourceBlockSize,
+            sourceBlockSize + sourceFrameWidth * 2.0f,
+            sourceFrameWidth,
+            Color::White);
+        Graphics::DrawRect(
+            sourceX - sourceFrameWidth,
+            sourceY,
+            sourceFrameWidth,
+            sourceBlockSize,
+            Color::White);
+        Graphics::DrawRect(
+            sourceX + sourceBlockSize,
+            sourceY,
+            sourceFrameWidth,
+            sourceBlockSize,
+            Color::White);
+    }
+
     // スター1の描画
     if (!stageStarCollected)
     {
@@ -533,7 +539,7 @@ void GameScene::Draw()
         int targetIdx =
             (heldIdx != -1)
                 ? heldIdx
-                : focusedIdx;
+                : (simulator.IsSourceFocused() ? -1 : focusedIdx);
 
         if (targetIdx >= 0 &&
             targetIdx < static_cast<int>(blocks.size()))
@@ -592,6 +598,7 @@ void GameScene::Draw()
                         }
                     }
                 }
+
             }
         }
     }
@@ -676,14 +683,31 @@ void GameScene::Draw()
         }
 
         int blockCount = 0;
+        bool displayedColors[7] = {};
 
         for (int y = 0; y < GRID_HEIGHT; y++)
         {
             if (currentGrid[x][y].hasBlock)
             {
+                FrameworkColor frameworkColor =
+                    currentGrid[x][y].color;
+                int colorIndex =
+                    static_cast<int>(frameworkColor);
+
+                if (colorIndex >= 0 &&
+                    colorIndex < 7 &&
+                    displayedColors[colorIndex])
+                {
+                    continue;
+                }
+
+                if (colorIndex >= 0 && colorIndex < 7)
+                {
+                    displayedColors[colorIndex] = true;
+                }
+
                 ColorF blockColor =
-                    GetColorFromFramework(
-                        currentGrid[x][y].color);
+                    GetColorFromFramework(frameworkColor);
 
                 float subY =
                     resultBarY +

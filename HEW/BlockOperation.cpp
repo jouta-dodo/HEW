@@ -273,17 +273,6 @@ void BlockOperation::Draw()
 	int drawX = 0;
 	int drawY = 0;
 
-	for (int x = 0;x < upperWidth;x++)
-	{
-		for (int y = 0;y < upperHeight;y++)
-		{
-			drawX = startX + x * (upperBlockSize + space);
-			drawY = startY + y * (upperBlockSize + space);
-			ColorF blockColor = GetBlockColor(m_upperblocks[x][y].type);
-			Graphics::DrawImage((float)drawX, (float)drawY, upperBlockSize, upperBlockSize, blocktexture, blockColor);
-		}
-	}
-
 	startY += 200;
 
 	for (int x = 0;x < lowerWidth;x++)
@@ -292,7 +281,22 @@ void BlockOperation::Draw()
 		{
 			drawX = startX + x * (lowerBlockSize + space);
 			drawY = startY + y * (lowerBlockSize + space);
-			ColorF blockColor = GetBlockColor(m_lowerblocks[x][y].type);
+
+			int sourceIndex = (y / 4) * 3 + (x / 4);
+			bool isSourceCell =
+				x % 4 < 3 &&
+				y % 4 < 3 &&
+				sourceIndex >= 0 &&
+				sourceIndex < 6;
+
+			BlockType blockType = BlockType::none;
+			if (!isSourceCell || sourceBlockVisible[sourceIndex])
+			{
+				blockType = static_cast<BlockType>(
+					blockdata.GetBlockData(y, x));
+			}
+
+			ColorF blockColor = GetBlockColor(blockType);
 			Graphics::DrawImage((float)drawX, (float)drawY, lowerBlockSize, lowerBlockSize, blocktexture, blockColor);
 		}
 	}
@@ -324,6 +328,14 @@ void BlockOperation::Draw()
 	//RendererDrawEnd();
 }
 
+void BlockOperation::SetSourceBlockVisible(int index, bool visible)
+{
+	if (index >= 0 && index < 6)
+	{
+		sourceBlockVisible[index] = visible;
+	}
+}
+
 void BlockOperation::Uninit()
 {
 	/*m_background.Uninit();
@@ -344,25 +356,6 @@ void BlockOperation::Uninit()
 
 void BlockOperation::upperSelectBlock()
 {
-	if (Input::IsKeyPressed(Key::A))
-	{
-		upperSelectMove(-1, 0);
-	}
-
-	if (Input::IsKeyPressed(Key::D))
-	{
-		upperSelectMove(1, 0);
-	}
-
-	if (Input::IsKeyPressed(Key::W))
-	{
-		upperSelectMove(0, -1);
-	}
-
-	if (Input::IsKeyPressed(Key::S))
-	{
-		upperSelectMove(0, 1);
-	}
 }
 
 void BlockOperation::upperSelectMove(int x, int y)
@@ -389,25 +382,6 @@ void BlockOperation::upperSelectMove(int x, int y)
 
 void BlockOperation::lowerSelectBlock()
 {
-	if (Input::IsKeyPressed(Key::A))
-	{
-		lowerMove(-1, 0);
-	}
-
-	if (Input::IsKeyPressed(Key::D))
-	{
-		lowerMove(1, 0);
-	}
-
-	if (Input::IsKeyPressed(Key::W))
-	{
-		lowerMove(0, 1);
-	}
-
-	if (Input::IsKeyPressed(Key::S))
-	{
-		lowerMove(0, -1);
-	}
 }
 
 void BlockOperation::lowerMove(int x, int y)
@@ -491,25 +465,6 @@ void BlockOperation::ShiftBlock(int dirx, int diry, int state)
 
 void BlockOperation::moveBlock()
 {
-	if (Input::IsKeyPressed(Key::A))
-	{
-		moveBlockX(-1);
-	}
-
-	if (Input::IsKeyPressed(Key::D))
-	{
-		moveBlockX(1);
-	}
-
-	if (Input::IsKeyPressed(Key::W))
-	{
-		moveBlockY(-1);
-	}
-
-	if (Input::IsKeyPressed(Key::S))
-	{
-		moveBlockY(1);
-	}
 }
 
 void BlockOperation::moveBlockX(int x)

@@ -1,9 +1,15 @@
 #include "PlacementSimulator.h"
+#include "PlacementSimulator.h"
 #include <iostream>
 #include <cmath>
 
-PlacementSimulator::PlacementSimulator() : focusedBlockIndex(0), heldBlockIndex(-1)
+PlacementSimulator::PlacementSimulator()
+    : focusedBlockIndex(-1),
+      heldBlockIndex(-1),
+      sourceFocusIndex(0),
+      focusIsSource(true)
 {
+    // テスト用ブロックは作らず、stage1.csvの6個の3×3ブロックを使用する。
     //固定ギミックと壁マップを初期化
     for (int x = 0; x < GRID_WIDTH; x++)
     {
@@ -18,32 +24,155 @@ PlacementSimulator::PlacementSimulator() : focusedBlockIndex(0), heldBlockIndex(
     stageFixedGimmickMap[2][2] = FrameworkColor::Blue; //青ギミック
     stageWallMap[1][1] = true;                         //1マスの壁
 
-    // =====================================================================
-    // ブロックの形を作るエリア：1がブロックの実体、0が空白
-    // =====================================================================
+    CSVLoad csvData;
+    csvData.LoadBlockCSV("assets/stage1.csv");
 
-    //赤のL字型
-    PlacedBlock b1;
-    b1.id = 1; b1.x = 0; b1.y = 0; b1.blockColor = FrameworkColor::Red; b1.isPlaced = true;
-    int s1[3][3] =
+    for (int sourceIndex = 0; sourceIndex < 6; sourceIndex++)
     {
-        {1, 0, 0},
-        {1, 0, 0},
-        {1, 1, 0}
-    };
-    for (int y = 0; y < 3; y++) for (int x = 0; x < 3; x++) b1.shape[y][x] = s1[y][x];
-    blocks.push_back(b1);
+        PlacedBlock sourceBlock{};
+        sourceBlock.id = sourceIndex + 1;
+        sourceBlock.x = 0;
+        sourceBlock.y = 0;
+        sourceBlock.sourceIndex = sourceIndex;
+        sourceBlock.isPlaced = false;
 
-    //横2マス型
-    PlacedBlock b2;
-    b2.id = 2; b2.x = 3; b2.y = 0; b2.blockColor = FrameworkColor::Yellow; b2.isPlaced = true;
-    int s2[3][3] = {
-        {1, 1, 0},
-        {0, 0, 0},
-        {0, 0, 0}
-    };
-    for (int y = 0; y < 3; y++) for (int x = 0; x < 3; x++) b2.shape[y][x] = s2[y][x];
-    blocks.push_back(b2);
+        int startX = (sourceIndex % 3) * 4;
+        int startY = (sourceIndex / 3) * 4;
+        FrameworkColor sourceColor = FrameworkColor::None;
+
+        for (int y = 0; y < 3; y++)
+        {
+            for (int x = 0; x < 3; x++)
+            {
+                int value = csvData.GetBlockData(startY + y, startX + x);
+                sourceBlock.shape[y][x] = (value != 0) ? 1 : 0;
+
+                if (sourceColor == FrameworkColor::None)
+                {
+                    if (value == 1) sourceColor = FrameworkColor::Red;
+                    else if (value == 2) sourceColor = FrameworkColor::Blue;
+                    else if (value == 3) sourceColor = FrameworkColor::Yellow;
+                }
+
+            }
+        }
+
+        sourceBlock.blockColor = sourceColor;
+        sourceBlocks.push_back(sourceBlock);
+        sourceAvailable.push_back(true);
+    }
+}
+
+bool PlacementSimulator::ReturnHeldBlockToSource()
+{
+    if (heldBlockIndex < 0 ||
+        heldBlockIndex >= static_cast<int>(blocks.size()))
+    {
+        return false;
+    }
+
+    const int returnedSourceIndex =
+        blocks[heldBlockIndex].sourceIndex;
+
+    if (returnedSourceIndex < 0 || returnedSourceIndex >= 6)
+    {
+        return false;
+    }
+
+    blocks.erase(blocks.begin() + heldBlockIndex);
+    sourceAvailable[returnedSourceIndex] = true;
+    sourceFocusIndex = returnedSourceIndex;
+    focusedBlockIndex = -1;
+    heldBlockIndex = -1;
+    focusIsSource = true;
+    return true;
+}
+
+void PlacementSimulator::MoveSelection(int dx, int dy)
+{
+    int currentX = 0;
+    int currentY = 0;
+
+    if (focusIsSource)
+    {
+        currentX = (sourceFocusIndex % 3) * 4 + 1;
+        currentY = 4 + (sourceFocusIndex / 3) * 4 + 1;
+    }
+    else if (focusedBlockIndex >= 0 &&
+        focusedBlockIndex < static_cast<int>(blocks.size()))
+    {
+        currentX = blocks[focusedBlockIndex].x + 1;
+        currentY = blocks[focusedBlockIndex].y + 1;
+    }
+    else
+    {
+        focusIsSource = true;
+        sourceFocusIndex = 0;
+        return;
+    }
+
+    int nextIndex = -1;
+    bool nextIsSource = false;
+    double minDistance = 9999.0;
+
+    for (size_t i = 0; i < blocks.size(); i++)
+    {
+        int candidateX = blocks[i].x + 1;
+        int candidateY = blocks[i].y + 1;
+        int diffX = candidateX - currentX;
+        int diffY = candidateY - currentY;
+
+        if ((dx != 0 && diffX * dx <= 0) ||
+            (dy != 0 && diffY * dy <= 0))
+        {
+            continue;
+        }
+
+        double distance = std::abs(diffX) + std::abs(diffY);
+        if (distance < minDistance)
+        {
+            minDistance = distance;
+            nextIndex = static_cast<int>(i);
+            nextIsSource = false;
+        }
+    }
+
+    for (size_t i = 0; i < sourceBlocks.size(); i++)
+    {
+        if (!sourceAvailable[i]) continue;
+
+        int candidateX = static_cast<int>(i % 3) * 4 + 1;
+        int candidateY = 4 + static_cast<int>(i / 3) * 4 + 1;
+        int diffX = candidateX - currentX;
+        int diffY = candidateY - currentY;
+
+        if ((dx != 0 && diffX * dx <= 0) ||
+            (dy != 0 && diffY * dy <= 0))
+        {
+            continue;
+        }
+
+        double distance = std::abs(diffX) + std::abs(diffY);
+        if (distance < minDistance)
+        {
+            minDistance = distance;
+            nextIndex = static_cast<int>(i);
+            nextIsSource = true;
+        }
+    }
+
+    if (nextIndex == -1) return;
+
+    if (nextIsSource)
+    {
+        sourceFocusIndex = nextIndex;
+        focusIsSource = true;
+    }
+    else
+    {
+        focusedBlockIndex = nextIndex;
+        focusIsSource = false;
+    }
 }
 
 //置く瞬間の重なりチェック3×3の「1」の部分だけで判定
@@ -119,11 +248,39 @@ void PlacementSimulator::ToggleGrab()
 {
     if (heldBlockIndex == -1)
     {
-        heldBlockIndex = focusedBlockIndex;
+        if (focusIsSource)
+        {
+            // 右下のCSVブロックを右上へ取得する。
+            if (sourceBlocks.empty() ||
+                sourceFocusIndex < 0 ||
+                sourceFocusIndex >= static_cast<int>(sourceBlocks.size()) ||
+                !sourceAvailable[sourceFocusIndex])
+            {
+                return;
+            }
+
+            PlacedBlock selectedBlock = sourceBlocks[sourceFocusIndex];
+            selectedBlock.id = static_cast<int>(blocks.size()) + 1;
+            selectedBlock.x = 0;
+            selectedBlock.y = 0;
+            selectedBlock.isPlaced = false;
+            blocks.push_back(selectedBlock);
+            sourceAvailable[sourceFocusIndex] = false;
+            focusedBlockIndex = static_cast<int>(blocks.size()) - 1;
+            focusIsSource = false;
+            heldBlockIndex = focusedBlockIndex;
+        }
+        else if (focusedBlockIndex >= 0 &&
+            focusedBlockIndex < static_cast<int>(blocks.size()))
+        {
+            heldBlockIndex = focusedBlockIndex;
+        }
     }
     else {
+        // 右上で移動中のブロックをSpaceで配置確定する。
         if (!CheckCollision(heldBlockIndex, blocks[heldBlockIndex].x, blocks[heldBlockIndex].y))
         {
+            blocks[heldBlockIndex].isPlaced = true;
             heldBlockIndex = -1;
         }
         else
@@ -166,10 +323,16 @@ void PlacementSimulator::MoveHeldBlock(int dx, int dy) {
 
 void PlacementSimulator::ResetBlocks()
 {
-    blocks[0].x = 0; blocks[0].y = 0;
-    blocks[1].x = 3; blocks[1].y = 0;
-    focusedBlockIndex = 0;
+    blocks.clear();
+    focusedBlockIndex = -1;
     heldBlockIndex = -1;
+    sourceFocusIndex = 0;
+    focusIsSource = true;
+    inputRepeatCounter = 0;
+    for (size_t i = 0; i < sourceAvailable.size(); i++)
+    {
+        sourceAvailable[i] = true;
+    }
 }
 
 void PlacementSimulator::DrawGrid() const

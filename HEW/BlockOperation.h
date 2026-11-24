@@ -66,6 +66,7 @@ private:
 	int num = 0;
 	int deleteX = 0;
 	int deleteY = 0;
+	bool sourceBlockVisible[6] = { true, true, true, true, true, true };
 
 	enum class Color
 	{
@@ -137,6 +138,8 @@ public:
 	//void SetColor();
 	// 描画処理
 	void Draw();
+    // PlacementSimulatorで取得済みのCSVブロックを右下で非表示にする。
+	void SetSourceBlockVisible(int index, bool visible);
 
 	// 解放処理
 	void Uninit();

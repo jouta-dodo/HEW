@@ -169,27 +169,8 @@ namespace Game
 		{
 			bool puzzleUpdated = false;
 
-			// WASDまたは矢印キーでブロック/フォーカス単位の移動
-			if (Input::IsKeyPressed(Key::W) || Input::IsKeyPressed(Key::Up)) {
-				if (simulator.GetHeldIndex() != -1) simulator.MoveHeldBlock(0, -1);
-				else simulator.MoveFocus(0, -1);
-				puzzleUpdated = true;
-			}
-			if (Input::IsKeyPressed(Key::S) || Input::IsKeyPressed(Key::Down)) {
-				if (simulator.GetHeldIndex() != -1) simulator.MoveHeldBlock(0, 1);
-				else simulator.MoveFocus(0, 1);
-				puzzleUpdated = true;
-			}
-			if (Input::IsKeyPressed(Key::A) || Input::IsKeyPressed(Key::Left)) {
-				if (simulator.GetHeldIndex() != -1) simulator.MoveHeldBlock(-1, 0);
-				else simulator.MoveFocus(-1, 0);
-				puzzleUpdated = true;
-			}
-			if (Input::IsKeyPressed(Key::D) || Input::IsKeyPressed(Key::Right)) {
-				if (simulator.GetHeldIndex() != -1) simulator.MoveHeldBlock(1, 0);
-				else simulator.MoveFocus(1, 0);
-				puzzleUpdated = true;
-			}
+            // WASDまたは矢印キーによるパズル操作
+			puzzleUpdated = simulator.UpdateInput();
 
 			// スペースキーでブロックを掴む・置く
 			bool isSpaceCurrent = (GetAsyncKeyState(VK_SPACE) & 0x8000) != 0;
