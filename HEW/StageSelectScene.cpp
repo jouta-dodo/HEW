@@ -27,28 +27,38 @@ void StageSelectScene::Init()
 
     player.Init(texPlayer);
     player.SetPos(200.0f, 350.0f);
+    fWasPressed = false;
 }
 
 void StageSelectScene::Update()
 {
     player.Update(PuzzleConstants::WindowWidth, 720.0f);
 
-    const bool isNearDoor = IsOverlapping(
-        player.GetX(),
-        player.GetY(),
-        player.GetWidth(),
-        player.GetHeight(),
-        doorX,
-        doorY,
-        doorWidth,
-        doorHeight
-    );
+    const bool fIsPressed =
+        (GetAsyncKeyState('F') & 0x8000) != 0;
 
-    // î‡Ç…ì¸ÇÈÇ∆ÉQÅ[ÉÄñ{ï“Ç÷à⁄ìÆ
-    if (isNearDoor)
+    for (int i = 0; i < DoorCount; i++)
     {
-        SceneManager::ChangeScene(new GameScene());
+        const bool isNearDoor = IsOverlapping(
+            player.GetX(),
+            player.GetY(),
+            player.GetWidth(),
+            player.GetHeight(),
+            doorX[i] - 30.0f,
+            doorY[i] - 30.0f,
+            doorWidth + 60.0f,
+            doorHeight + 60.0f
+        );
+
+        if (isNearDoor && fIsPressed && !fWasPressed)
+        {
+            SceneManager::ChangeScene(new GameScene());
+            fWasPressed = fIsPressed;
+            return;
+        }
     }
+
+    fWasPressed = fIsPressed;
 }
 
 void StageSelectScene::Draw()
@@ -64,14 +74,24 @@ void StageSelectScene::Draw()
             ColorF(0.3f, 0.3f, 0.3f, 1.0f)
         );
 
-        Graphics::DrawImage(
-            doorX,
-            doorY,
-            doorWidth,
-            doorHeight,
-            texWhite,
-            Color::Red
-        );
+        const ColorF doorColors[DoorCount] = {
+            Color::Red,
+            Color::Blue,
+            Color::Green,
+            Color::Yellow
+        };
+
+        for (int i = 0; i < DoorCount; i++)
+        {
+            Graphics::DrawImage(
+                doorX[i],
+                doorY[i],
+                doorWidth,
+                doorHeight,
+                texWhite,
+                doorColors[i]
+            );
+        }
     }
 
     player.Draw();

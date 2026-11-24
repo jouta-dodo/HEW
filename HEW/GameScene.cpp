@@ -362,7 +362,7 @@ void GameScene::Draw()
     if (simulator.IsSourceFocused())
     {
         const int sourceFocusIndex = simulator.GetSourceFocusIndex();
-        const float sourceStartX = 800.0f;
+        const float sourceStartX = 950.0f;
         const float sourceStartY = 450.0f;
         const float sourceCellSize = 22.0f;
         const float sourceCellSpacing = 5.0f;

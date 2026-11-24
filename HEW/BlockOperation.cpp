@@ -267,7 +267,7 @@ void BlockOperation::Update()
 
 void BlockOperation::Draw()
 {
-	int startX = 800;
+    int startX = 950;
 	int startY = 250;
 	int space = 5;
 	int drawX = 0;
