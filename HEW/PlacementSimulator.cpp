@@ -22,7 +22,7 @@ PlacementSimulator::PlacementSimulator()
 
     // 固定ギミック・壁の配置のエリア
     stageFixedGimmickMap[2][2] = FrameworkColor::Blue; //青ギミック
-    stageWallMap[1][1] = true;                         //1マスの壁
+    stageWallMap[4][1] = true;                         //1マスの壁
 
     CSVLoad csvData;
     csvData.LoadBlockCSV("assets/stage1.csv");

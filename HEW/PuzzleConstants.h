@@ -12,11 +12,12 @@ namespace PuzzleConstants
 	constexpr float RightMargin = 25.0f;
 	constexpr float FrameWidth = 4.0f;
 	constexpr float WindowWidth = 1280.0f;
+   constexpr float WorldWidth = 2560.0f;
 	constexpr float PuzzleStartY = 40.0f;
 
 	// ステージスターの位置とサイズ
 	constexpr float StageStarX = 300.0f;
-	constexpr float StageStarY = 300.0f;
+    constexpr float StageStarY = 610.0f;
 	constexpr float StageStarSize = 40.0f;
 
 	// パズルスターの配置マス
@@ -26,7 +27,7 @@ namespace PuzzleConstants
 
 	// ゴールオブジェクト
 	constexpr float GoalX = 760.0f;
-	constexpr float GoalY = 350.0f;
+ constexpr float GoalY = 550.0f;
 	constexpr float GoalWidth = 70.0f;
 	constexpr float GoalHeight = 100.0f;
 }

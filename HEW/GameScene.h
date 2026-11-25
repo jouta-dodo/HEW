@@ -36,6 +36,7 @@ private:
     bool tickStarCollected = false;
 
     bool resultShown = false;
+    float cameraX = 0.0f;
 
     bool IsOverlapping(
         float x1,

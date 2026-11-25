@@ -168,6 +168,7 @@ void GameScene::Init()
 
     player.Init(texPlayer);
     bo.Init(texWhite);
+    cameraX = 0.0f;
 }
 
 void GameScene::Update()
@@ -260,15 +261,32 @@ void GameScene::Update()
         }
 
         player.Update(
-            PuzzleConstants::WindowWidth,
+            PuzzleConstants::WorldWidth,
             720.0f);
+
+        cameraX = player.GetX() -
+            PuzzleConstants::WindowWidth * 0.5f;
+
+        if (cameraX < 0.0f)
+        {
+            cameraX = 0.0f;
+        }
+
+        const float maxCameraX =
+            PuzzleConstants::WorldWidth -
+            PuzzleConstants::WindowWidth;
+
+        if (cameraX > maxCameraX)
+        {
+            cameraX = maxCameraX;
+        }
 
         // プレイヤーのリスタート
         bool rNow = (GetAsyncKeyState('R') & 0x8000) != 0;
 
         if (rNow && !rWasPressed)
         {
-            player.SetPos(590.0f, 310.0f);
+            player.SetPos(590.0f, 550.0f);
             player.SetVelocityY(0.0f);
             player.SetGrounded(true);
             player.SetDead(false);
@@ -285,6 +303,7 @@ void GameScene::Update()
         if ((GetAsyncKeyState('Q') & 0x8000))
         {
             currentPhase = GamePhase::Setup;
+            cameraX = 0.0f;
             needsRedraw = true;
         }
 
@@ -348,14 +367,22 @@ void GameScene::Draw()
 
     // ゴールオブジェクト
     Graphics::DrawImage(
-        PuzzleConstants::GoalX,
+        PuzzleConstants::GoalX - cameraX,
         PuzzleConstants::GoalY,
         PuzzleConstants::GoalWidth,
         PuzzleConstants::GoalHeight,
         texWhite,
         Color::Green);
 
-    player.Draw();
+    Graphics::DrawImage(
+        -cameraX,
+        650.0f,
+        PuzzleConstants::WorldWidth,
+        70.0f,
+        texWhite,
+        ColorF(0.3f, 0.3f, 0.3f, 1.0f));
+
+    player.Draw(cameraX);
     bo.Draw();
 
     // CSVブロックの選択中枠
@@ -406,7 +433,7 @@ void GameScene::Draw()
     if (!stageStarCollected)
     {
         Graphics::DrawImage(
-            PuzzleConstants::StageStarX,
+            PuzzleConstants::StageStarX - cameraX,
             PuzzleConstants::StageStarY,
             PuzzleConstants::StageStarSize,
             PuzzleConstants::StageStarSize,

@@ -24,18 +24,39 @@ void StageSelectScene::Init()
 
     texPlayer = Graphics::LoadTexture(L"assets\\ui.png");
     texWhite = Graphics::LoadTexture(L"assets\\siroiro.png");
+    texFKey = Graphics::LoadTexture(L"assets\\F_key_01.png");
 
     player.Init(texPlayer);
-    player.SetPos(200.0f, 350.0f);
+    player.SetPos(200.0f, 550.0f);
+    cameraX = 0.0f;
     fWasPressed = false;
 }
 
 void StageSelectScene::Update()
 {
-    player.Update(PuzzleConstants::WindowWidth, 720.0f);
+    player.Update(PuzzleConstants::WorldWidth, 720.0f);
+
+    cameraX = player.GetX() -
+        PuzzleConstants::WindowWidth * 0.5f;
+
+    if (cameraX < 0.0f)
+    {
+        cameraX = 0.0f;
+    }
+
+    const float maxCameraX =
+        PuzzleConstants::WorldWidth -
+        PuzzleConstants::WindowWidth;
+
+    if (cameraX > maxCameraX)
+    {
+        cameraX = maxCameraX;
+    }
 
     const bool fIsPressed =
         (GetAsyncKeyState('F') & 0x8000) != 0;
+
+    playerNearDoor = false;
 
     for (int i = 0; i < DoorCount; i++)
     {
@@ -56,6 +77,11 @@ void StageSelectScene::Update()
             fWasPressed = fIsPressed;
             return;
         }
+
+        if (isNearDoor)
+        {
+            playerNearDoor = true;
+        }
     }
 
     fWasPressed = fIsPressed;
@@ -66,10 +92,10 @@ void StageSelectScene::Draw()
     if (texWhite.Get() != nullptr)
     {
         Graphics::DrawImage(
-            100.0f,
-            450.0f,
-            1080.0f,
-            20.0f,
+            -cameraX,
+            650.0f,
+            PuzzleConstants::WorldWidth,
+            70.0f,
             texWhite,
             ColorF(0.3f, 0.3f, 0.3f, 1.0f)
         );
@@ -77,14 +103,13 @@ void StageSelectScene::Draw()
         const ColorF doorColors[DoorCount] = {
             Color::Red,
             Color::Blue,
-            Color::Green,
-            Color::Yellow
+            Color::Green
         };
 
         for (int i = 0; i < DoorCount; i++)
         {
             Graphics::DrawImage(
-                doorX[i],
+                doorX[i] - cameraX,
                 doorY[i],
                 doorWidth,
                 doorHeight,
@@ -94,5 +119,18 @@ void StageSelectScene::Draw()
         }
     }
 
-    player.Draw();
+    player.Draw(cameraX);
+
+    if (playerNearDoor && texFKey.Get() != nullptr)
+    {
+        const float promptSize = 48.0f;
+        Graphics::DrawImage(
+            player.GetX() - cameraX +
+                (player.GetWidth() - promptSize) * 0.5f,
+            player.GetY() - promptSize - 6.0f,
+            promptSize,
+            promptSize,
+            texFKey,
+            Color::White);
+    }
 }

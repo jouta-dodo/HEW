@@ -26,7 +26,7 @@ void Player::Init(ComPtr<ID3D11ShaderResourceView> texture)
 	m_x = 640.0f - 50.0f;
 	m_width = 100.0f;
 	m_height = 100.0f;
-	m_y = 450.0f - m_height;
+    m_y = 650.0f - m_height;
 
 	m_velocityY = 0.0f;
 	m_isGrounded = true;  // Å‰‚©‚ç’n–Ê‚É—§‚Á‚Ä‚¢‚éó‘Ô‚É‚·‚é
@@ -73,9 +73,9 @@ void Player::UpdateGravity(float screenWidth, float screenHeight)
 
 	m_previousY = m_y;
 
-	const float platformX1 = 100.0f;
-	const float platformX2 = screenWidth - 100.0f;
-	const float platformY = 450.0f;
+    const float platformX1 = 0.0f;
+	const float platformX2 = screenWidth;
+	const float platformY = 650.0f;
 	const bool overlapsPlatform =
 		m_x + m_width >= platformX1 &&
 		m_x <= platformX2;
@@ -112,11 +112,17 @@ void Player::UpdateGravity(float screenWidth, float screenHeight)
 	}
 }
 
-void Player::Draw()
+void Player::Draw(float cameraX)
 {
 	if (m_texture.Get() != nullptr)
 	{
-		Graphics::DrawImage(m_x, m_y, m_width, m_height, m_texture, Color::White);
+      Graphics::DrawImage(
+			m_x - cameraX,
+			m_y,
+			m_width,
+			m_height,
+			m_texture,
+			Color::White);
 	}
 }
 
