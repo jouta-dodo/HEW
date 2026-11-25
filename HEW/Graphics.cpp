@@ -19,6 +19,7 @@ ComPtr<ID3D11PixelShader>Graphics::s_pixelShader;
 ComPtr<ID3D11InputLayout>Graphics::s_inputLayout;
 
 ComPtr<ID3D11SamplerState> Graphics::s_samplerState;
+ComPtr<ID3D11BlendState> Graphics::s_blendState;
 ComPtr<ID3D11ShaderResourceView> Graphics::s_whiteTexture;
 
 int Graphics::s_screenWidth = 0;
@@ -139,6 +140,24 @@ bool Graphics::Init(HWND hwnd, int width, int height)
 	sampDesc.ComparisonFunc = D3D11_COMPARISON_NEVER;
 	s_device->CreateSamplerState(&sampDesc, &s_samplerState);
 
+	D3D11_BLEND_DESC blendDesc = {};
+	blendDesc.RenderTarget[0].BlendEnable = TRUE;
+	blendDesc.RenderTarget[0].SrcBlend = D3D11_BLEND_SRC_ALPHA;
+	blendDesc.RenderTarget[0].DestBlend = D3D11_BLEND_INV_SRC_ALPHA;
+	blendDesc.RenderTarget[0].BlendOp = D3D11_BLEND_OP_ADD;
+	blendDesc.RenderTarget[0].SrcBlendAlpha = D3D11_BLEND_ONE;
+	blendDesc.RenderTarget[0].DestBlendAlpha = D3D11_BLEND_INV_SRC_ALPHA;
+	blendDesc.RenderTarget[0].BlendOpAlpha = D3D11_BLEND_OP_ADD;
+	blendDesc.RenderTarget[0].RenderTargetWriteMask =
+		D3D11_COLOR_WRITE_ENABLE_ALL;
+	s_device->CreateBlendState(&blendDesc, &s_blendState);
+
+	float blendFactor[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
+	s_context->OMSetBlendState(
+		s_blendState.Get(),
+		blendFactor,
+		0xffffffff);
+
 	D3D11_TEXTURE2D_DESC td = {};
 	td.Width = 1;
 	td.Height = 1;
@@ -163,6 +182,7 @@ void Graphics::Uninit()
 {
 	s_whiteTexture.Reset();
 	s_samplerState.Reset();
+ s_blendState.Reset();
 	s_vertexBuffer.Reset();
 	s_inputLayout.Reset();
 	s_vertexShader.Reset();

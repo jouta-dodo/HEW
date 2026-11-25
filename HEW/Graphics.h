@@ -79,6 +79,7 @@ private:
 	static ComPtr<ID3D11InputLayout>s_inputLayout;
 
 	static ComPtr<ID3D11SamplerState> s_samplerState;
+ static ComPtr<ID3D11BlendState> s_blendState;
 	static ComPtr<ID3D11ShaderResourceView> s_whiteTexture;
 
 	static int s_screenWidth;

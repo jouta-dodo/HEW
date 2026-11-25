@@ -461,6 +461,9 @@ void GameScene::Draw()
             ? texWhite
             : texPlayer;
 
+    const int currentTick =
+        tickManager.GetCurrentTick();
+
     ColorF woodColor(
         0.55f,
         0.38f,
@@ -472,6 +475,19 @@ void GameScene::Draw()
         0.35f,
         0.35f,
         1.0f);
+
+    auto GetCellDisplayColor = [&](const ColorF& color, int x)
+    {
+        ColorF displayColor = color;
+
+        if (currentPhase == GamePhase::Playing &&
+            x != currentTick - 1)
+        {
+            displayColor.a = 0.35f;
+        }
+
+        return displayColor;
+    };
 
     // 盤面データを取得
     BlockCell currentGrid[GRID_WIDTH][GRID_HEIGHT];
@@ -502,7 +518,7 @@ void GameScene::Draw()
                     cellSize,
                     cellSize,
                     baseTex,
-                    wallColor);
+                    GetCellDisplayColor(wallColor, x));
             }
             else if (currentGrid[x][y].hasBlock)
             {
@@ -515,7 +531,7 @@ void GameScene::Draw()
                     cellSize,
                     cellSize,
                     baseTex,
-                    cellColor);
+                    GetCellDisplayColor(cellColor, x));
             }
             else
             {
@@ -536,7 +552,7 @@ void GameScene::Draw()
                         cellSize + frameWidth * 2.0f,
                         cellSize + frameWidth * 2.0f,
                         baseTex,
-                        gimmickBorderColor);
+                        GetCellDisplayColor(gimmickBorderColor, x));
 
                     Graphics::DrawImage(
                         drawX,
@@ -544,7 +560,7 @@ void GameScene::Draw()
                         cellSize,
                         cellSize,
                         baseTex,
-                        Color::White);
+                        GetCellDisplayColor(Color::White, x));
                 }
                 else
                 {
@@ -554,7 +570,7 @@ void GameScene::Draw()
                         cellSize,
                         cellSize,
                         baseTex,
-                        woodColor);
+                        GetCellDisplayColor(woodColor, x));
                 }
             }
         }
@@ -687,9 +703,6 @@ void GameScene::Draw()
 
     float subBoxSize =
         cellSize / 3.0f - 2.0f;
-
-    const int currentTick =
-        tickManager.GetCurrentTick();
 
     for (int x = 0; x < GRID_WIDTH; x++)
     {
