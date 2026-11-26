@@ -15,6 +15,14 @@ SaveData::SaveData() {
     stageDataList.resize(maxStages);
 }
 
+void SaveData::ResetAll()
+{
+    for (int i = 0; i < maxStages; i++)
+    {
+        stageDataList[i] = StageSaveData{};
+    }
+}
+
 /**
  * @brief 指定ステージのデータを取得
  */

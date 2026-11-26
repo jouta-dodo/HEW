@@ -5,6 +5,11 @@
 
 using namespace std;
 
+GameScene::GameScene(int stageIndex)
+    : stageIndex(stageIndex)
+{
+}
+
 bool GameScene::IsOverlapping(
     float x1,
     float y1,
@@ -161,7 +166,7 @@ void GameScene::DrawStarCount()
 
 void GameScene::Init()
 {
-    std::cout << "=== パズルゲーム本体初期化 ===\n";
+    std::cout << " パズルゲーム本体初期化 \n";
 
     texPlayer = Graphics::LoadTexture(L"assets\\ui.png");
     texWhite = Graphics::LoadTexture(L"assets\\siroiro.png");
@@ -169,6 +174,13 @@ void GameScene::Init()
     player.Init(texPlayer);
     bo.Init(texWhite);
     cameraX = 0.0f;
+
+    saveData.Load();
+    const StageSaveData& stageData =
+        saveData.GetStageData(stageIndex);
+    stageStarCollected = stageData.star1_action;
+    clearStarCollected = stageData.star2_puzzle;
+    tickStarCollected = stageData.star3_time;
 }
 
 void GameScene::Update()
@@ -232,7 +244,7 @@ void GameScene::Update()
 
             system("cls");
 
-            cout << "=== 【フェーズ: アクション・プレイ中】 ===\n";
+            cout << " 【フェーズ: アクション・プレイ中】 \n";
             cout << "([E] キーで配置フェーズに戻ります)\n\n";
         }
 
@@ -320,6 +332,7 @@ void GameScene::Update()
                 PuzzleConstants::StageStarSize))
         {
             stageStarCollected = true;
+            SaveStageProgress();
             std::cout << "\nスター1を獲得しました！\n";
         }
 
@@ -343,6 +356,8 @@ void GameScene::Update()
                 tickStarCollected = true;
             }
 
+            SaveStageProgress();
+
             resultShown = true;
 
             const int collectedCount =
@@ -358,7 +373,24 @@ void GameScene::Update()
                       << collectedCount
                       << " / 3\n";
         }
+
     }
+}
+
+void GameScene::SaveStageProgress()
+{
+    StageSaveData& stageData =
+        saveData.GetStageData(stageIndex);
+
+    stageData.star1_action = stageStarCollected;
+    stageData.star2_puzzle = clearStarCollected;
+    stageData.star3_time = tickStarCollected;
+    stageData.earnedStars =
+        (stageStarCollected ? 1 : 0) +
+        (clearStarCollected ? 1 : 0) +
+        (tickStarCollected ? 1 : 0);
+    stageData.isCleared = clearStarCollected;
+    saveData.Save();
 }
 
 void GameScene::Draw()

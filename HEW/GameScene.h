@@ -10,6 +10,7 @@
 #include "Graphics.h"
 #include "Input.h"
 #include "TickManager.h"
+#include "SaveData.h"
 
 class GameScene : public IScene
 {
@@ -37,6 +38,8 @@ private:
 
     bool resultShown = false;
     float cameraX = 0.0f;
+    int stageIndex = 0;
+    SaveData saveData;
 
     bool IsOverlapping(
         float x1,
@@ -57,8 +60,10 @@ private:
 
     void DrawStarCount();
     void DrawResultOverlay();
+    void SaveStageProgress();
 
 public:
+    explicit GameScene(int stageIndex = 0);
     void Init() override;
     void Update() override;
     void Draw() override;

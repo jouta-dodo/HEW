@@ -1,6 +1,7 @@
 #pragma once
 #include "Scene.h"
 #include "Graphics.h"
+#include "SaveData.h"
 
 class TitleScene : public IScene
 {

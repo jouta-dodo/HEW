@@ -2,6 +2,8 @@
 #include "Scene.h"
 #include "Player.h"
 #include "Graphics.h"
+#include "SaveData.h"
+#include "Input.h"
 
 class StageSelectScene : public IScene
 {
@@ -19,6 +21,18 @@ private:
     float cameraX = 0.0f;
     bool fWasPressed = false;
     bool playerNearDoor = false;
+    SaveData saveData;
+    ComPtr<ID3D11ShaderResourceView> texGameReturn;
+    ComPtr<ID3D11ShaderResourceView> texTitleReturn;
+    bool menuOpen = false;
+    int menuSelection = 0;
+    bool tabWasPressed = false;
+    bool menuUpWasPressed = false;
+    bool menuDownWasPressed = false;
+    bool menuConfirmWasPressed = false;
+
+    void DrawDigit(int digit, float x, float y, float size, const ColorF& color);
+    void DrawPauseMenu();
 
     bool IsOverlapping(float x1, float y1, float w1, float h1, float x2, float y2, float w2, float h2);
 

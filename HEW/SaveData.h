@@ -37,6 +37,9 @@ public:
     //return bool 成功した場合はtrue、失敗した場合はfalse
     bool Save();
 
+    // 全ステージのクリア・スター進捗を初期化する。
+    void ResetAll();
+
 
     //ファイルから全ステージのデータを読み込む（ロード）
     //return bool 成功した場合はtrue、ファイルが存在しない等の場合はfalse

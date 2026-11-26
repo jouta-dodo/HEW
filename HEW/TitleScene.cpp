@@ -11,7 +11,8 @@ void TitleScene::Init()
     texContinue = Graphics::LoadTexture(L"assets\\tsuzukikara.png");
     texEnd = Graphics::LoadTexture(L"assets\\game_end.png");
     selectedOption = 0;
-    spaceWasPressed = false;
+    // 前の画面で決定に使ったSpaceキーを離すまで、タイトル側では受け付けない。
+    spaceWasPressed = true;
     upWasPressed = false;
     downWasPressed = false;
     enterWasPressed = false;
@@ -49,6 +50,14 @@ void TitleScene::Update()
         if (selectedOption == 2)
         {
             PostQuitMessage(0);
+        }
+        else if (selectedOption == 0)
+        {
+            SaveData saveData;
+            saveData.Load();
+            saveData.ResetAll();
+            saveData.Save();
+            SceneManager::ChangeScene(new StageSelectScene());
         }
         else
         {
@@ -100,23 +109,21 @@ void TitleScene::Draw()
         const float y = menuY +
             i * (menuHeight + menuSpacing);
 
-        if (i == selectedOption)
-        {
-            Graphics::DrawRect(
-                menuX - 8.0f,
-                y - 8.0f,
-                menuWidth + 16.0f,
-                menuHeight + 16.0f,
-                Color::Cyan);
-        }
+        const float scale = (i == selectedOption) ? 1.15f : 1.0f;
+        const float drawWidth = menuWidth * scale;
+        const float drawHeight = menuHeight * scale;
+        const float drawX =
+            menuX + (menuWidth - drawWidth) * 0.5f;
+        const float drawY =
+            y + (menuHeight - drawHeight) * 0.5f;
 
         if (menuTextures[i].Get() != nullptr)
         {
             Graphics::DrawImage(
-                menuX,
-                y,
-                menuWidth,
-                menuHeight,
+                drawX,
+                drawY,
+                drawWidth,
+                drawHeight,
                 menuTextures[i],
                 Color::White);
         }
