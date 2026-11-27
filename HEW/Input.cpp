@@ -4,7 +4,7 @@
 #include<Xinput.h>
 #include<vector>
 #include<unordered_map>
-
+#include<cmath>
 #pragma comment(lib,"xinput.lib")
 
 namespace
@@ -210,4 +210,42 @@ bool Input::IsButtonRelesed(Button btn)
 	bool cur = (s_padState.Gamepad.wButtons & mask) != 0;
 	bool prev = (s_prevPadState.Gamepad.wButtons & mask) != 0;
 	return !cur && prev;
+}
+
+//====================
+	//デッドゾーンの計算
+	//====================
+float NormalizeStick(short value, short deadzone)
+{
+	//デッドゾーン以内
+	if (std::abs(value) < deadzone)
+	{
+		return 0.0f;
+	}
+
+	float normalized = (value > 0)
+		? static_cast<float>(value - deadzone) / (32767.0f - deadzone)
+		: static_cast<float>(value + deadzone) / (32768.0f - deadzone);
+
+	return normalized;
+}
+
+float Input::GetLeftStickX()
+{
+	return NormalizeStick(s_padState.Gamepad.sThumbLX, XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE);
+}
+
+float Input::GetLeftStickY()
+{
+	return NormalizeStick(s_padState.Gamepad.sThumbLY, XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE);
+}
+
+float Input::GetRightStickX()
+{
+	return NormalizeStick(s_padState.Gamepad.sThumbRX, XINPUT_GAMEPAD_RIGHT_THUMB_DEADZONE);
+}
+
+float Input::GetRightStickY()
+{
+	return NormalizeStick(s_padState.Gamepad.sThumbRY, XINPUT_GAMEPAD_RIGHT_THUMB_DEADZONE);
 }

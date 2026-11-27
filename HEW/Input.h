@@ -71,6 +71,17 @@ public:
 	static bool IsButtonHeld(Button btn);
 	static bool IsButtonRelesed(Button btn);
 
+	//=========================
+	//左スティックの傾き習得
+	//=========================
+	static float GetLeftStickX();
+	static float GetLeftStickY();
+
+	//==========================
+	//右スティックの傾きの習得
+	//==========================
+	static float GetRightStickX();
+	static float GetRightStickY();
 
 	Input() = delete;
 };

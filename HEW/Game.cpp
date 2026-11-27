@@ -158,11 +158,49 @@ namespace Game
 
 		// 起動時のシーンをタイトルにする
 		SceneManager::ChangeScene(new TitleScene());
+
+		//=======================================================================
+		//音の再生の使い方
+		//
+		//読み込み方
+		// BGMの場合
+		// Audio::Load(L"assets\\stage1.mp3",L"BgmStage1");
+		// 
+		// SEの場合
+		// Audio::Load(L"assets\\jump.wav",L"SeJump");
+		// このようにまず読み込むファイルのパスを入力してその音源の名前決めます
+		// 
+		// 呼び方
+		// Audio::PlayBGM(L"BgmStage1");
+		// BGMを呼ぶ場合はInitでこう書くと呼べます
+		// 
+		// SEを呼ぶ場合は
+		// Audio::PlaySE(L"SeJump");
+		// この書き方のやつをUpdateの使いたいところに書くと呼べます
+		//=======================================================================
 	}
 
 	void Update()
 	{
 
+		//===========================================
+		// スティックの使い方
+		// 
+		// まずスティックの傾きを取得する
+		// 例
+		// float stickX=Input::GetLeftStickX();
+		// float stickY=Input::GetLeftStickY();
+		// 
+		// 傾き具合によっての移動速度を決める
+		// player+=stickX*5.0f;
+		// player-=stickY*5.0f;
+		// 
+		// 下のように書くと既存のキーと十字キーも併用できる
+		// if(Input::IsHeld(Cmd::MoveLeft)) playerX-=5.0f;
+		// if(Input::IsHeld(Cmd::MoveRight)) playerX+=5.0f;
+		// ==========================================
+		
+		//===========================================
 		//  パズル配置フェーズ
 		// ==========================================
 		if (currentPhase == GamePhase::Setup)
